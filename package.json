@@ -17,6 +17,7 @@
     "@fullcalendar/resource-timeline": "^6.1.9",
     "@fullcalendar/timegrid": "^6.1.9",
     "@fullcalendar/vue3": "^6.1.9",
+    "axios": "^1.6.2",
     "install": "^0.13.0",
     "npm": "^10.2.3",
     "pinia": "^2.1.7",
