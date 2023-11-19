@@ -1,14 +1,9 @@
 <script setup>
-// import { RouterLink, RouterView } from 'vue-router'
-import CalendarComp from './components/CalendarComp.vue'
+import LayoutView from './views/LayoutView.vue';
 </script>
 
 <template>
   <header>
-
-      <CalendarComp  />
-
+    <LayoutView />
   </header>
-
-
 </template>
