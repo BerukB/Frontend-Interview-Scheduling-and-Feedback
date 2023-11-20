@@ -7,7 +7,7 @@
       >
         <MenuList />
       </div>
-      <div class="ml-56 mt-16 p-6">
+      <div class="ml-56 mt-16 p-6 w-full">
         <RouterView />
       </div>
     </div>
