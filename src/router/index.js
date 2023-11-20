@@ -1,15 +1,21 @@
-// import { createRouter, createWebHistory } from 'vue-router'
-// import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import ScheduleView from '@/views/ScheduleView.vue';
+import FeedbackView from '@/views/FeedbackView.vue';
 
-// const router = createRouter({
-//   history: createWebHistory(import.meta.env.BASE_URL),
-//   routes: [
-//     {
-//       path: '/',
-//       name: 'home',
-//       component: HomeView
-//     }
-//   ]
-// })
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: '/',
+      name: 'Schedule',
+      component: ScheduleView,
+    },
+    {
+      path: '/feedback',
+      name: 'Feedback',
+      component: FeedbackView,
+    },
+  ],
+});
 
-// export default router
+export default router;
