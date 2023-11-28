@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="flex items-center bg-white py-2 px-4 h-16 shadow-sm fixed w-full"
+    class="flex items-center bg-white py-2 px-4 h-16 shadow-sm fixed w-full z-10"
   >
     <div class="flex items-center justify-start w-56">
       <img src="/MMCYTech.png" alt="Logo" class="w-32" />

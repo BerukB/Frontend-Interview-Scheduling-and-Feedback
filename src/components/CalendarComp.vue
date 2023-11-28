@@ -7,12 +7,19 @@ import InteractionPlugin from '@fullcalendar/interaction'
 import ListPlugin from '@fullcalendar/list'
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline'
 
+
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+// import { Calendar } from '@fullcalendar/core';
+import bootstrap5Plugin from '@fullcalendar/bootstrap5';
+
 import { reactive, computed, ref, onMounted } from 'vue'
 import { useScheduleStore } from '../stores/scheduleStore';
 
 import PopUp from './PopUp.vue'
 
 const scheduleStore = useScheduleStore();
+// const calendarRef = ref(null);
 
 const events = computed(() => scheduleStore.getEvents);
 console.log("One:", events);
@@ -28,24 +35,26 @@ const handleSelect = (arg) => {
   })
 }
 
-const handleClick = (arg) =>{
+const openPopup = () =>{
   showPopup.value = true;
 }
 
 console.log("I am here",events);
 
 const calendarOptions = reactive({
-  plugins:[DayGridPlugin,TimeGridPlugin,InteractionPlugin,ListPlugin,resourceTimelinePlugin],
-  initialView: 'dayGridMonth',
+  plugins:[DayGridPlugin,TimeGridPlugin,InteractionPlugin,ListPlugin,resourceTimelinePlugin,bootstrap5Plugin ],
+  initialView: 'timeGridWeek',
   headerToolbar: {
     left: 'title',
-    center: 'dayGridMonth, timeGridWeek, timeGridDay, listWeek',
+    center: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
     right: 'prev today next',
   },
-  selectable: true,
+  selectable: false,
   events: events.value,
-  select: handleSelect,
-  eventClick: handleClick,
+  themeSystem: 'bootstrap5',
+  backgroundColor: 'rgb(0, 98, 255)',
+  // select: handleSelect,
+  // eventClick: handleClick,
 
 })
 
@@ -67,6 +76,7 @@ onMounted(async () => {
 
     // Set the events in the store
     // scheduleStore.setEvents(allEvents);
+    
 
     console.log("Events:", allEvents);
   } catch (error) {
@@ -76,11 +86,16 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="p-10">
-    
+
+    <div class="px-10 bg-red ">
+      
+      <div class="flex justify-end ">
+        <button @click="openPopup" class="p-2 mb-3 bg-orange-400 text-white">New Schedule</button>
+      </div>
+
       <Fullcalendar 
       :options="calendarOptions"
-      class="container ml-auto "
+
       />
       <PopUp v-show="showPopup"/>
     </div>

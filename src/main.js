@@ -12,6 +12,9 @@ import {
   faCalendarCheck,
 } from '@fortawesome/free-solid-svg-icons';
 
+import VCalendar from 'v-calendar';
+import 'v-calendar/style.css';
+
 import App from './App.vue';
 import router from './router';
 
@@ -19,7 +22,10 @@ const app = createApp(App);
 
 library.add(faCalendar, faHouse, faCommentDots, faUsers, faCalendarCheck);
 
+
+
 app.component('font-awesome-icon', FontAwesomeIcon);
+app.use(VCalendar, {})
 
 app.use(createPinia());
 app.use(router);

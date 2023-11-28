@@ -43,5 +43,20 @@
         "attendance": "present",
         "scheduledDate": "2023-11-14T13:00:00.000Z",
         "updatedDate": ""
+    },
+    {
+        "id": 4,
+        "title": "interview",
+        "candidate": "dubale",
+        "interviewType": "client",
+        "startDateTime": "2023-11-20T13:00:00.000Z",
+        "endDateTime": "2023-11-20T13:30:00.000Z",
+        "interviewerName": "shutterfly",
+        "client": "shutterfly",
+        "feedback": "Very good I like him",
+        "scheduledBy": "Sami",
+        "attendance": "present",
+        "scheduledDate": "2023-11-19T13:00:00.000Z",
+        "updatedDate": ""
     }
 ]
