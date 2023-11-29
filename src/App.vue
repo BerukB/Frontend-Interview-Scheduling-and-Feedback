@@ -1,5 +1,5 @@
 <script setup>
-import LayoutView from './views/LayoutView.vue';
+import LayoutView from '@/views/LayoutView.vue';
 </script>
 
 <template>

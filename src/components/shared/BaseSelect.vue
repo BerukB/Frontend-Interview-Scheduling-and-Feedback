@@ -10,11 +10,11 @@
     >
       <option
         v-for="option in options"
-        :value="option"
-        :key="option"
-        :selected="option === modelValue"
+        :value="option.value"
+        :key="option.value"
+        :selected="option.value === modelValue"
       >
-        {{ option }}
+        {{ option.label }}
       </option>
     </select>
   </div>
