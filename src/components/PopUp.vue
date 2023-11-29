@@ -1,11 +1,11 @@
 <script setup>
-import { reactive, ref, computed, onMounted, watch} from 'vue';
+import { reactive, ref, onMounted } from 'vue';
 import axios from 'axios';
 import BaseInput from '@/components/shared/BaseInput.vue';
 import BaseSelect from '@/components/shared/BaseSelect.vue';
 import BaseButton from '@/components/shared/BaseButton.vue';
 // import BaseSearchInput from './shared/BaseSearchInput.vue';
-import ComboBox from './shared/ComboBox.vue';
+// import ComboBox from './shared/ComboBox.vue';
 // const searchInput = ref('');
 
 import { useScheduleStore } from '../stores/scheduleStore';
@@ -13,26 +13,38 @@ const scheduleStore = useScheduleStore();
 
 const interviewerListSet = ref(false);
 const isClientListSet = ref(false);
+const isCandidateListSet = ref(false);
 const clientList = ref([]);
 const interviewerList = ref([]);
+const candidateList = ref([]);
+
 
 const interviewType = ref([
-  'In-person',
-  'Client'
+  {value: 'In-person',label: 'In-person',},
+  {value: 'Client', label: 'Client',}
+
 ])
 
 const durationList = ref([5, 10, 15, 20, 25, 30, 45, 60])
-
+const formattedDurationList = durationList.value.map(duration => ({
+  value: duration.toString(), // Convert the number to a string if needed
+  label: `${duration} minutes`,
+}));
 
 const schedule = reactive({
   candidate: '',
   date: '',
   duration: '',
   interviewType: '',
-  interviewer: '', 
+  interviewer: '',
   client: '',
 })
-
+const closePopup = () =>{
+  for (const key in schedule) {
+    schedule[key] = ''; // Reset each form field to an empty string
+  }
+ scheduleStore.setPopupValue(false);
+}
 const fetchClient = async () => {
   try {
     await scheduleStore.setClientList();
@@ -55,7 +67,21 @@ const fetchInterviewer = async () => {
 
     interviewerList.value = scheduleStore.getInterviewerList.map(interviewer => ({
       value: interviewer._id,
-      label: interviewer.firstName
+      label: `${interviewer.firstName} ${interviewer.lastName}`
+    }));
+  } catch (error) {
+    console.error('Error in setClientList:', error);
+  }
+};
+
+const fetchCandidate = async () => {
+  try {
+    await scheduleStore.setCandidateList();
+    isCandidateListSet.value = true;
+
+    candidateList.value = scheduleStore.getCandidateList.map(candidate => ({
+      value: candidate._id,
+      label: `${candidate.firstName} ${candidate.lastName}`
     }));
   } catch (error) {
     console.error('Error in setClientList:', error);
@@ -63,45 +89,46 @@ const fetchInterviewer = async () => {
 };
 
 onMounted(async () => {
-  await Promise.all([fetchClient(), fetchInterviewer()]);
+  await Promise.all([fetchClient(), fetchInterviewer(), fetchCandidate()]);
   console.log("CLIENTS:", clientList.value);
   console.log("interviewerList:", interviewerList.value);
+  console.log("candList:", candidateList.value);
 });
 
 
 
-const user = ref()
-console.log("helooooooo", user.value)
-async function loadUsers(query, setOptions) {
-  const response = await axios.get("http://localhost:3000/api/clients", {
-    params: { q: query }
-  });
-  const result = response.data.data;
-  console.log("weeeeeeeeeeeee", result)
+// const user = ref()
+// console.log("helooooooo", user.value)
+// async function loadUsers(query, setOptions) {
+//   const response = await axios.get("http://localhost:3000/api/clients", {
+//     params: { q: query }
+//   });
+//   const result = response.data.data;
+//   console.log("weeeeeeeeeeeee", result)
 
-  setOptions(
-    result.map(user => {
-      return {
-        value: user._id,
-        label: user.name,
-      }
-    })
-  )
-}
+//   setOptions(
+//     result.map(user => {
+//       return {
+//         value: user._id,
+//         label: user.name,
+//       }
+//     })
+//   )
+// }
 
 
 
 async function submit() {
-  // try {
-    console.log("DATA", schedule);
-  //   const response = await axios.post('http://localhost:3000/api/schedules', schedule.value);
+  try {
+  console.log("DATA", schedule);
+    const response = await axios.post('http://localhost:3000/api/schedules', schedule);
 
-  //   console.log("POST response:", response.data);
+    console.log("POST response:", response.data);
 
-  // } catch (error) {
-  //   console.error("Error in POST request:", error);
+  } catch (error) {
+    console.error("Error in POST request:", error);
 
-  // }
+  }
 }
 </script>
 
@@ -111,16 +138,16 @@ async function submit() {
       <form @submit.prevent="submit">
         <!-- Your popup content goes here -->
         <BaseSelect :options="candidateList" v-model="schedule.candidate" label="Candidate" />
-        <BaseInput v-model="schedule.startDateTime" label="Date" type="datetime-local" name="scheduleDate" />
+        <BaseInput v-model="schedule.date" label="Date" type="datetime-local" name="scheduleDate" />
         <BaseSelect :options="interviewType" v-model="schedule.interviewType" label="Interview Type" />
-        <BaseSelect :options="durationList" v-model="schedule.durationList" label="Duration" />
+        <BaseSelect :options="formattedDurationList" v-model="schedule.duration" label="Duration" />
         <BaseSelect :options="interviewerList" v-model="schedule.interviewer" label="Interviewer" />
 
         <BaseSelect :options="clientList" v-model="schedule.client" label="client" />
         <!-- <ComboBox :load-options="loadUsers" v-model="user" /> -->
 
         <div class="flex justify-end ">
-          <BaseButton text="Discard" buttonType="secondary" />
+          <BaseButton @click="closePopup" text="Discard" buttonType="secondary" />
           <BaseButton text="Submit" type="submit" />
         </div>
       </form>

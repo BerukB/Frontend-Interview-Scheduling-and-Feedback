@@ -13,33 +13,34 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 // import { Calendar } from '@fullcalendar/core';
 import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 
-import { reactive, computed, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, computed } from 'vue'
 import { useScheduleStore } from '../stores/scheduleStore';
 
 import PopUp from './PopUp.vue'
 
 const scheduleStore = useScheduleStore();
-// const calendarRef = ref(null);
+const eventsList = ref([]);
+const showPopup = computed(() => scheduleStore.getPopupValue);
+const isEventsListSet = ref(false);
 
-const events = computed(() => scheduleStore.getEvents);
-console.log("One:", events);
-const showPopup = ref(false);
-
-const handleSelect = (arg) => {
-  console.log(arg);
-  scheduleStore.setEvents({
-    title: "something",
-    start: arg.start,
-    end: arg.end,
-    allDay: arg.allDay
-  })
-}
+console.log("isEventsListSetbefore", isEventsListSet.value);
 
 const openPopup = () =>{
-  showPopup.value = true;
+ scheduleStore.setPopupValue(true);
+ console.log("showpop",showPopup.value)
 }
 
-console.log("I am here",events);
+
+// const handleSelect = (arg) => {
+//   console.log(arg);
+//   scheduleStore.setEvents({
+//     title: "something",
+//     start: arg.start,
+//     end: arg.end,
+//     allDay: arg.allDay
+//   })
+// }
+
 
 const calendarOptions = reactive({
   plugins:[DayGridPlugin,TimeGridPlugin,InteractionPlugin,ListPlugin,resourceTimelinePlugin,bootstrap5Plugin ],
@@ -50,7 +51,7 @@ const calendarOptions = reactive({
     right: 'prev today next',
   },
   selectable: false,
-  events: events.value,
+  events: eventsList.value = scheduleStore.getEvents,
   themeSystem: 'bootstrap5',
   backgroundColor: 'rgb(0, 98, 255)',
   // select: handleSelect,
@@ -61,28 +62,38 @@ const calendarOptions = reactive({
 
 onMounted(async () => {
   try {
-    const response = await axios.get('/src/db.json');
-    const eventsData = response.data; // Assuming it's an array
-
-    // Map the response data to FullCalendar event format
-    const allEvents = eventsData.map(event => (  scheduleStore.setEvents({
-      id: event.id,
-      title: event.title,
-      start: new Date(event.startDateTime),
-      end: new Date(event.endDateTime),
-      allDay: false,
-      // Add other properties as needed
-    })));
-
-    // Set the events in the store
-    // scheduleStore.setEvents(allEvents);
+    const response = await axios.get('http://localhost:3000/api/schedules');
+    const eventsData = response.data.data; 
     
+    const allEvents = eventsData.map(event => {
+      const startDate = new Date(event.date);
+      const endDate = new Date(startDate.getTime() + event.duration * 60 * 1000);
 
-    console.log("Events:", allEvents);
+      const eventData = {
+        id: event._id,
+        title: event.interviewType,
+        start: startDate,
+        end: endDate,
+        allDay: false,
+        // Add other properties as needed
+      };
+
+      return eventData; 
+    });
+    scheduleStore.setEvents(allEvents);
+    isEventsListSet.value = true;
+
+    eventsList.value = scheduleStore.getEvents;
+
+    console.log("isEventsListSetmount", isEventsListSet.value);
+    
   } catch (error) {
     console.error('Error fetching events:', error);
   }
+
+
 });
+console.log("EventsList",  eventsList.value);
 </script>
 
 <template>
@@ -94,6 +105,7 @@ onMounted(async () => {
       </div>
 
       <Fullcalendar 
+ v-if="isEventsListSet"
       :options="calendarOptions"
 
       />
