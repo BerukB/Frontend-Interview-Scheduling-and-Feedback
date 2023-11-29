@@ -1,0 +1,96 @@
+<template>
+  <div
+    class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 pr-10 lg:px-8"
+  >
+    <div
+      class="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg"
+    >
+      <table class="min-w-full">
+        <thead>
+          <tr>
+            <th class="px-6 py-3 border-b-2 text-left text-sm">Fullname</th>
+            <th class="px-6 py-3 border-b-2 text-left text-sm">Email</th>
+            <th class="px-6 py-3 border-b-2 text-left text-sm">Phone</th>
+            <th class="px-6 py-3 border-b-2 text-left text-sm">Status</th>
+            <th class="px-6 py-3 border-b-2 text-left text-sm">Created At</th>
+            <th class="px-6 py-3 border-b-2 "></th>
+          </tr>
+        </thead>
+        <tbody class="bg-white">
+          <tr
+            v-for="candidate in candidateStore.candidates"
+            :key="candidate._id"
+          >
+            <td class="table-data">
+              <div class="text-sm">
+                {{ candidate.user?.firstName }} {{ candidate.user?.lastName }}
+              </div>
+            </td>
+            <td class="table-data">
+              {{ candidate.user?.email }}
+            </td>
+            <td class="table-data">
+              {{ candidate.user?.phoneNumber }}
+            </td>
+            <td class="table-data">
+              <BaseChip
+                v-if="candidate.status == 'Pending' || candidate.status == 'Interviewed'"
+                :text="candidate.status"
+                type="warning"
+              />
+              <BaseChip
+                v-else-if="candidate.status == 'Hired'"
+                :text="candidate.status"
+                type="success"
+              />
+              <BaseChip v-else :text="candidate.status" type="danger" />
+            </td>
+            <td class="table-data">
+              {{ DMYFormat(candidate.createdAt )}}
+            </td>
+            <td
+              class="flex gap-3 px-6 py-4 text-right border-b border-gray-300"
+            >
+              <RouterLink to="">
+                <font-awesome-icon
+                  icon="fa-solid fa-calendar-plus"
+                  class="text-primary"
+                />
+              </RouterLink>
+              <RouterLink
+                :to="{name: 'CandidateDetails', params: {id: candidate._id}}"
+              >
+                <font-awesome-icon
+                  icon="fa-solid fa-eye"
+                  class="text-secondary"
+                />
+              </RouterLink>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { RouterLink } from 'vue-router';
+import BaseChip from '@/components/shared/BaseChip.vue'
+import { onMounted, ref } from 'vue';
+import { useCandidateStore } from '@/stores/candidate';
+import { DMYFormat } from '@/utils/DateFormat.js'
+
+const candidates = ref([])
+
+const candidateStore = useCandidateStore()
+
+onMounted(() => {
+    candidates.value = candidateStore.fetchCandidates()
+})
+</script>
+
+<style>
+.table-data {
+    @apply px-6 py-4 border-b border-gray-300 text-sm
+}
+</style>

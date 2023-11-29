@@ -5,19 +5,32 @@ import { createPinia } from 'pinia';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
-  faCalendar,
   faHouse,
   faCommentDots,
   faUsers,
   faCalendarCheck,
+  faEye,
+  faCalendarPlus,
+  faCircleCheck,
 } from '@fortawesome/free-solid-svg-icons';
+
+import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 
 import App from './App.vue';
 import router from './router';
 
 const app = createApp(App);
 
-library.add(faCalendar, faHouse, faCommentDots, faUsers, faCalendarCheck);
+library.add(
+  faCalendar,
+  faHouse,
+  faCommentDots,
+  faUsers,
+  faCalendarCheck,
+  faEye,
+  faCalendarPlus,
+  faCircleCheck
+);
 
 app.component('font-awesome-icon', FontAwesomeIcon);
 
