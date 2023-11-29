@@ -218,9 +218,9 @@ const state = reactive({
 })
 
 const resultOptions = ref([
-  'Passed',
-  'Failed',
-  'Pending'
+  {label: 'Passed', value: 'Test'},
+  {label: 'Passed', value: 'Test'},
+  {label: 'Passed', value: 'Test'},
 ])
 
 const educationalStatusOptions = ref([
