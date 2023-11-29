@@ -1,15 +1,17 @@
-import { defineStore } from "pinia";
-import { getClients } from "../services/clientService";
-import { getInterviewer, getCandidate } from "../services/userService";
-import { ref } from "vue";
+import { defineStore } from 'pinia';
+import { getClients } from '../services/clientService';
+import { getInterviewer, getCandidate } from '../services/UserServices';
+import { ref } from 'vue';
+import { getSchedules } from '../services/ScheduleService';
 
-export const useScheduleStore = defineStore("schedule", {
+export const useScheduleStore = defineStore('schedule', {
   state: () => ({
     events: ref([]),
     clientList: ref([]),
     interviewerList: ref([]),
     candidateList: ref([]),
     showPopup: ref(false),
+    schedules: ref([]),
   }),
   getters: {
     getEvents() {
@@ -27,11 +29,18 @@ export const useScheduleStore = defineStore("schedule", {
     getPopupValue() {
       return this.showPopup;
     },
+    getSchedules() {
+      return this.schedules.value;
+    },
   },
   actions: {
     setEvents(event) {
       // this.events.push(event);
       this.events.value = event;
+    },
+    async setSchedules() {
+      const result = await getSchedules();
+      this.schedules.value = result.data.data;
     },
     setPopupValue(value) {
       this.showPopup = value;
@@ -42,7 +51,7 @@ export const useScheduleStore = defineStore("schedule", {
 
         this.clientList.value = result.data.data;
       } catch (error) {
-        console.error("Error in POST request:", error);
+        console.error('Error in POST request:', error);
       }
     },
     async setInterviewerList() {
@@ -51,7 +60,7 @@ export const useScheduleStore = defineStore("schedule", {
 
         this.interviewerList.value = result.data.data;
       } catch (error) {
-        console.error("Error in POST request:", error);
+        console.error('Error in POST request:', error);
       }
     },
     async setCandidateList() {
@@ -60,7 +69,7 @@ export const useScheduleStore = defineStore("schedule", {
 
         this.candidateList.value = result.data.data;
       } catch (error) {
-        console.error("Error in POST request:", error);
+        console.error('Error in POST request:', error);
       }
     },
   },

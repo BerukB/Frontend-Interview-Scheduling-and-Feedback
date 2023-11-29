@@ -16,4 +16,26 @@ const updateUser = (data) => {
   return apiClient.patch('/users', data);
 };
 
-export { getUsers, getUserById, createUser, updateUser };
+const getInterviewer = () => {
+  return apiClient.get('/users', {
+    params: {
+      role: 'Interviewer',
+    },
+  });
+};
+const getCandidate = () => {
+  return apiClient.get('/users', {
+    params: {
+      role: 'Candidate',
+    },
+  });
+};
+
+export {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  getInterviewer,
+  getCandidate,
+};
