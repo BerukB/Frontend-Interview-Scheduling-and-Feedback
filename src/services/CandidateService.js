@@ -1,7 +1,7 @@
 import { apiClient } from './service';
 
-const getCandidates = () => {
-  return apiClient.get('/candidates');
+const getCandidates = (params = '') => {
+  return apiClient.get(`/candidates${params}`);
 };
 
 const getCandidateById = (id) => {

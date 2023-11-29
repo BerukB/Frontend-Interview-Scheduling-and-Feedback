@@ -1,8 +1,11 @@
 import { apiClient } from './service';
 
 const getSchedules = (params = '') => {
-  console.log('params', params);
   return apiClient.get(`/schedules?${params}`);
+};
+
+const getScheduleById = (id) => {
+  return apiClient.get(`/schedules/${id}`);
 };
 
 const createSchedule = (data) => {
@@ -10,8 +13,7 @@ const createSchedule = (data) => {
 };
 
 const updateSchedule = (data) => {
-  console.log('UPDATE', data);
   return apiClient.patch('/schedules', data);
 };
 
-export { getSchedules, createSchedule, updateSchedule };
+export { getSchedules, getScheduleById, createSchedule, updateSchedule };

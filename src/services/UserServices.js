@@ -1,7 +1,11 @@
 import { apiClient } from './service';
 
-const getUsers = () => {
-  return apiClient.get('/users');
+const getUsers = (params = '') => {
+  return apiClient.get(`/users${params}`);
+};
+
+const getUserById = (id) => {
+  return apiClient.get(`/users/${id}`);
 };
 
 const createUser = (data) => {
@@ -12,4 +16,4 @@ const updateUser = (data) => {
   return apiClient.patch('/users', data);
 };
 
-export { getUsers, createUser, updateUser };
+export { getUsers, getUserById, createUser, updateUser };
