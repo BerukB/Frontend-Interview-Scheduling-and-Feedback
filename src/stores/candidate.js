@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { getCandidates } from '@/services/candidateService';
+import { getCandidates } from '@/services/CandidateService';
 
 export const useCandidateStore = defineStore('candidate', () => {
   const candidates = ref([]);

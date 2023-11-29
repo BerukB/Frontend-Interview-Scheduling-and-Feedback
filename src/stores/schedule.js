@@ -8,7 +8,6 @@ export const useScheduleStore = defineStore('schedule', () => {
   async function fetchSchedules() {
     const { data } = await getSchedules();
     schedules.value = data.data;
-    console.log('SCHEDULES', schedules.value);
   }
 
   //   const filterInterviewer = computed(() =>
