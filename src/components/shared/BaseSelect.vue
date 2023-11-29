@@ -12,7 +12,7 @@
         v-for="option in options"
         :value="option.value"
         :key="option.value"
-        :selected="option.value === modelValue"
+        :selected="option === modelValue"
       >
         {{ option.label }}
       </option>

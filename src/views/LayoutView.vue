@@ -1,6 +1,6 @@
 <template>
   <div>
-    <AppBar />
+    <AppBar  />
     <div class="min-h-screen flex flex-row bg-[#f7f9fb]">
       <div
         class="flex flex-col w-56 bg-white overflow-hidden shadow-sm fixed mt-16 h-full"
