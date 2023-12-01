@@ -76,16 +76,14 @@
 <script setup>
 import { RouterLink } from 'vue-router';
 import BaseChip from '@/components/shared/BaseChip.vue'
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
 import { useCandidateStore } from '@/stores/candidate';
 import { DMYFormat } from '@/utils/DateFormat.js'
-
-const candidates = ref([])
 
 const candidateStore = useCandidateStore()
 
 onMounted(() => {
-    candidates.value = candidateStore.fetchCandidates()
+    candidateStore.fetchCandidates()
 })
 </script>
 

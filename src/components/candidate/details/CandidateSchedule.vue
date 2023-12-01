@@ -97,10 +97,19 @@
             <div
               class="mt-4 invisible group-hover/list:visible transition-all duration\"
             >
-              <RouterLink to="/feedback">
-                <BaseButton text="Add Feedback" buttonType="primary" />
+              <RouterLink
+                :to="{name: 'Feedback', query: { schedule: JSON.stringify(schedule) }}"
+              >
+                <BaseButton
+                  :text="schedule.feedback ? 'Edit Feedback' : 'Add Feedback'"
+                  buttonType="primary"
+                />
               </RouterLink>
-              <BaseButton text=" Cancel" buttonType="secondary" />
+              <BaseButton
+                v-if="CheckDate(schedule.date) && !schedule.feedback"
+                text=" Cancel"
+                buttonType="secondary"
+              />
             </div>
           </div>
         </div>
@@ -111,17 +120,19 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
 import { getSchedules } from '@/services/ScheduleService.js';
 import BaseButton from '@/components/shared/BaseButton.vue'
 import BaseChip from '@/components/shared/BaseChip.vue'
 import { MDYhmFormat } from '@/utils/DateFormat.js'
+import { CheckDate } from '@/utils/CheckDate.js'
 
 const schedules = ref([])
 
+const route = useRoute()
+
 onMounted(async () => {
-  const { data } = await getSchedules('candidate=6565cf21c50ce7db8dc54cd7');
-  console.log("CANDIDATE:", data.data);
+  const { data } = await getSchedules(`candidate=${route.params.id}`);
   schedules.value = data.data
 })
 </script>

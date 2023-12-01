@@ -13,11 +13,10 @@ import {
   faCalendarPlus,
   faCircleCheck,
 } from '@fortawesome/free-solid-svg-icons';
-
+import { faCalendar, faCircleXmark } from '@fortawesome/free-regular-svg-icons';
 
 import VCalendar from 'v-calendar';
 import 'v-calendar/style.css';
-import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 
 import App from './App.vue';
 import router from './router';
@@ -32,13 +31,12 @@ library.add(
   faCalendarCheck,
   faEye,
   faCalendarPlus,
-  faCircleCheck
+  faCircleCheck,
+  faCircleXmark
 );
 
-
-
 app.component('font-awesome-icon', FontAwesomeIcon);
-app.use(VCalendar, {})
+app.use(VCalendar, {});
 
 app.use(createPinia());
 app.use(router);

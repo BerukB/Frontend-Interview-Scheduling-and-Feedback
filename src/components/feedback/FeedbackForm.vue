@@ -1,53 +1,34 @@
 <template>
   <form @submit.prevent="submit">
     <div class="flex justify-between mb-6 gap-6">
-      <div class="w-1/2">
+      <div class="w-full">
         <BaseInput
-          v-model="state.position"
+          v-model="position"
           label="Interview Position"
           type="text"
           name="position"
+          readonly
         />
-      </div>
-      <div class="w-1/2">
-        <label class="block text-sm mb-2">Candidate Name</label>
-        <select v-model="state.candidate">
-          <option
-            v-for="candidate in candidates"
-            :key="candidate"
-            :value="candidate._id"
-          >
-            {{ candidate.firstName }} {{ candidate.lastName }}
-          </option>
-        </select>
-        <!-- <BaseInput
-          v-model="state.candidate"
-          label="Interviewee Name"
-          type="text"
-          name="candidate"
-        /> -->
       </div>
     </div>
     <div class="flex justify-between mb-6 gap-6">
       <div class="w-1/2">
         <BaseInput
-          v-model="state.date"
+          v-model="date"
           label="Interview Date"
-          type="date"
+          type="text"
           name="date"
+          readonly
         />
       </div>
       <div class="w-1/2">
-        <label class="block text-sm mb-2">Interviewer Name</label>
-        <select v-model="state.interviewer">
-          <option
-            v-for="interviewer in interviewers"
-            :key="interviewer"
-            :value="interviewer._id"
-          >
-            {{ interviewer.firstName }} {{ interviewer.lastName }}
-          </option>
-        </select>
+        <BaseInput
+          v-model="interviewer"
+          label="Interviewer Name"
+          type="text"
+          name="interviewer"
+          readonly
+        />
       </div>
     </div>
     <div class="mt-6">
@@ -108,8 +89,8 @@
             >Willingness to work in rotational shifts</label
           >
           <BaseRadioGroup
-            v-model="state.rotaionalShift"
-            name="rotaionalShift"
+            v-model="state.rotationalShift"
+            name="rotationalShift"
             :options="BooleanOptions"
             vertical
           />
@@ -191,53 +172,69 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, reactive, ref, toRefs } from 'vue';
 import BaseInput from '@/components/shared/BaseInput.vue';
 import BaseSelect from '@/components/shared/BaseSelect.vue';
 import BaseButton from '@/components/shared/BaseButton.vue';
 import BaseRadioGroup from '@/components/shared/BaseRadioGroup.vue';
 import { updateSchedule } from '@/services/ScheduleService'
-import { useUserStore } from '@/stores/user'
-import { useScheduleStore } from '@/stores/schedule'
+import { MDYhmFormat } from '@/utils/DateFormat.js'
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
+
+const props = defineProps({
+  schedule: {
+    type: Object
+  }
+})
+
+const { schedule } = toRefs(props)
+
+const position = ref(schedule.value.position)
+const date = ref(MDYhmFormat(schedule.value.date))
+
+
+const interviewer = computed(() => {
+  return `${schedule.value.interviewer.firstName} ${schedule.value.interviewer.lastName}`
+})
 
 const state = reactive({
-    position:'',
-    candidate: '',
-    date: '',
-    interviewer: '',
-    typingTestResult:'',
-    testGorillaResult: '',
-    educationalStatus: '',
-    rotaionalShift: '',
-    weekend: '',
-    training: '',
-    threeMonthContract: '',
-    salary: '',
-    kebeleID: '',
-    personalFeedback: ''
+    result: schedule.value.feedback?.result || '',
+    enockResult: schedule.value.feedback?.enockResult || '',
+    typingTestResult: schedule.value.feedback?.typingTestResult || '',
+    testGorillaResult: schedule.value.feedback?.testGorillaResult || '',
+    educationalStatus: schedule.value.feedback?.educationalStatus || '',
+    workStatus: schedule.value.feedback?.workStatus || '',
+    rotationalShift: schedule.value.feedback?.rotationalShift,
+    weekend: schedule.value.feedback?.weekend,
+    training: schedule.value.feedback?.training,
+    threeMonthContract: schedule.value.feedback?.threeMonthContract,
+    salary: schedule.value.feedback?.salary,
+    kebeleID: schedule.value.feedback?.kebeleID,
+    personalFeedback: schedule.value.feedback?.personalFeedback
 })
 
 const resultOptions = ref([
-  {label: 'Passed', value: 'Test'},
-  {label: 'Passed', value: 'Test'},
-  {label: 'Passed', value: 'Test'},
+  {label: 'Passed', value: 'Passed'},
+  {label: 'Failed', value: 'Failed'},
 ])
 
 const educationalStatusOptions = ref([
-  'Collage Dropout',
-  '12th graduate ',
-  'Undergraduate',
-  'Bachelors Degree',
-  'Masters Degree',
-  'Doctorate or Ph.D.'
+  {label: 'Collage Dropout', value: 'Collage Dropout'},
+  {label: '12th graduate', value: '12th graduate'},
+  {label: 'Undergraduate', value: 'Undergraduate'},
+  {label: 'Bachelors Degree', value: 'Bachelors Degree'},
+  {label: 'Masters Degree', value: 'Masters Degree'},
+  {label: 'Doctorate or Ph.D.', value: 'Doctorate or Ph.D.'}
 ])
 
 const workStatusOptions = ref([
-  'Employed',
-  'Unemployed',
-  'Self-Employed',
-  'Freelancer',
-  'Intern'
+  {label: 'Employed', value: 'Employed'},
+  {label: 'Unemployed', value: 'Unemployed'},
+  {label: 'Self-Employed', value: 'Self-Employed'},
+  {label: 'Freelancer', value: 'Freelancer'},
+  {label: 'Intern', value: 'Intern'}
 ])
 
 const BooleanOptions = ref([
@@ -245,49 +242,13 @@ const BooleanOptions = ref([
   {label: 'No', value: false}
 ])
 
-const userStore = useUserStore()
-
-const scheduleStore = useScheduleStore()
-
-const interviewers = computed(() => {
-  return userStore.filterInterviewers
-})
-
-const candidates = computed(()=>{
-  return userStore.filterCandidates
-})
+const feedbackData = {
+  attendance: 'Came',
+  feedback: state
+}
 
 function submit() {
-    console.log("DATA", state);
-    updateSchedule(state)
+  updateSchedule(schedule.value._id, feedbackData)
+  router.back()
 }
-
-// function interviewers() {
-//   getSchedules()
-// }
-
-onMounted(() => {
-  userStore.fetchUsers()
-  scheduleStore.fetchSchedules(`interviewer=654e3f74027ffa948ebb09e2`)
-})
 </script>
-
-<style scoped>
-select {
-  width: 100%;
-  height: 52px;
-  min-width: 300px;
-  padding: 0 24px 0 10px;
-  vertical-align: middle;
-  background: #fff
-    url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E")
-    no-repeat right 12px center;
-  background-size: 8px 10px;
-  border: solid 1px rgba(0, 0, 0, 0.4);
-  border-radius: 0;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  @apply border border-gray-100 bg-gray-50 rounded-md
-}
-</style>
