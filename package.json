@@ -26,14 +26,18 @@
     "@headlessui/vue": "^1.7.16",
     "@heroicons/vue": "^2.0.18",
     "@popperjs/core": "^2.11.8",
+    "@vuelidate/core": "^2.0.3",
+    "@vuelidate/validators": "^2.0.4",
     "axios": "^1.6.2",
     "dayjs": "^1.11.10",
     "install": "^0.13.0",
+    "lodash": "^4.17.21",
     "npm": "^10.2.3",
     "pinia": "^2.1.7",
     "v-calendar": "^3.1.2",
     "vue": "^3.3.4",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vue3-toastify": "^0.1.14"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.4.0",
