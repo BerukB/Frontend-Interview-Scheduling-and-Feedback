@@ -1,9 +1,9 @@
 <template>
   <h3 class="font-bold mb-4">Schedules</h3>
   <hr />
-
+  <ScheduleSkeleton v-if="isLoading" />
   <ol class="border-l-2 border-secondary border-opacity-25 mt-10">
-    <li v-for="schedule in scheduleStore.schedules" :key="schedule._id">
+    <li v-for="schedule in schedules" :key="schedule._id">
       <div class="flex-start md:flex">
         <div
           class="-ml-[13px] flex h-[25px] w-[25px] items-center justify-center rounded-full bg-[#fcd9d3] text-secondary"
@@ -129,10 +129,14 @@ import BaseChip from '@/components/shared/BaseChip.vue'
 import { MDYhmFormat } from '@/utils/DateFormat.js'
 import { CheckDate } from '@/utils/CheckDate.js'
 import { useScheduleStore } from '@/stores/schedule';
+import ScheduleSkeleton from '../../skeleton/ScheduleSkeleton.vue';
+import { storeToRefs } from 'pinia';
 
 const route = useRoute()
 
 const scheduleStore = useScheduleStore()
+
+const { schedules, isLoading } = storeToRefs(scheduleStore)
 
 onMounted(() => {
   scheduleStore.fetchSchedules(`candidate=${route.params.id}`)

@@ -23,5 +23,5 @@ export const useCandidateStore = defineStore('candidate', () => {
     }
   }
 
-  return { candidates, fetchCandidates };
+  return { candidates, fetchCandidates, isLoading };
 });

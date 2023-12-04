@@ -51,5 +51,5 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     }
   }
 
-  return { schedules, fetchSchedules, editSchedule, addSchedule };
+  return { schedules, fetchSchedules, editSchedule, addSchedule, isLoading };
 });
