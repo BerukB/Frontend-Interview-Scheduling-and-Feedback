@@ -16,9 +16,9 @@
             <th class="px-6 py-3 border-b-2 "></th>
           </tr>
         </thead>
-        <tbody class="bg-white">
+        <tbody class="bg-white" v-if="!isLoading">
           <tr
-            v-for="candidate in candidateStore.candidates"
+            v-for="candidate in candidates"
             :key="candidate._id"
             class="group/row hover:bg-gray-50 transition-all duration-300"
           >
@@ -77,6 +77,7 @@
           </tr>
         </tbody>
       </table>
+      <TableSkeleton v-if="isLoading" />
     </div>
   </div>
 </template>
@@ -87,8 +88,12 @@ import BaseChip from '@/components/shared/BaseChip.vue'
 import { onMounted } from 'vue';
 import { useCandidateStore } from '@/stores/candidate';
 import { DMYFormat } from '@/utils/DateFormat.js'
+import TableSkeleton from '@/components/skeleton/TableSkeleton.vue';
+import { storeToRefs } from 'pinia'
 
 const candidateStore = useCandidateStore()
+
+const { candidates, isLoading }= storeToRefs(candidateStore)
 
 onMounted(() => {
     candidateStore.fetchCandidates()
