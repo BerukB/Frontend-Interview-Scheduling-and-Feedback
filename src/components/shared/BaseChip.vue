@@ -36,4 +36,7 @@ const chipClass = computed(() => {
 .warning {
     @apply bg-orange-100 text-orange-900
 }
+.info {
+    @apply bg-blue-100 text-blue-900
+}
 </style>

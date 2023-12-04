@@ -32,7 +32,7 @@ defineProps({
       required: true
     },
     modelValue: {
-      type: [String, Number],
+      type: [String, Number, Boolean],
       required: true
     },
     vertical: {
