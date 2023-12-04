@@ -46,13 +46,19 @@
 </template>
 
 <script setup>
-import { toRefs } from 'vue';
+import { onMounted, ref } from 'vue';
+import { getCandidateById } from '@/services/CandidateService';
 
 const props = defineProps({
-  candidate: {
+  candidateId: {
     type: String
   }
 })
 
-const { candidate } = toRefs(props)
+const candidate = ref({})
+
+onMounted(async () => {
+const { data } = await getCandidateById(props.candidateId)
+candidate.value = data
+})
 </script>

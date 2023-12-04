@@ -3,7 +3,7 @@
   <hr />
 
   <ol class="border-l-2 border-secondary border-opacity-25 mt-10">
-    <li v-for="schedule in schedules" :key="schedule._id">
+    <li v-for="schedule in scheduleStore.schedules" :key="schedule._id">
       <div class="flex-start md:flex">
         <div
           class="-ml-[13px] flex h-[25px] w-[25px] items-center justify-center rounded-full bg-[#fcd9d3] text-secondary"
@@ -30,6 +30,11 @@
             type="warning"
           />
           <BaseChip
+            v-if="schedule.interviewType == 'Phone'"
+            :text="schedule.interviewType"
+            type="info"
+          />
+          <BaseChip
             v-else-if="schedule.interviewType == 'Client'"
             :text="schedule.interviewType"
             type="success"
@@ -45,6 +50,13 @@
             v-if="schedule.attendance == 'Absent'"
             :text="schedule.attendance"
             type="danger"
+            class="mx-2"
+          />
+
+          <BaseChip
+            v-if="schedule.attendance == 'Pending'"
+            :text="schedule.attendance"
+            type="warning"
             class="mx-2"
           />
 
@@ -71,15 +83,6 @@
                   {{ schedule.interviewer?.lastName }}</span
                 >
               </li>
-              <li class="flex items-center">
-                <font-awesome-icon
-                  icon="fa-solid fa-circle-check"
-                  class="text-xs"
-                />
-
-                <span class="mx-2">Attendance:</span>
-                <span>{{ schedule.attendance }}</span>
-              </li>
 
               <li class="flex items-center">
                 <font-awesome-icon
@@ -101,7 +104,7 @@
                 :to="{name: 'Feedback', query: { schedule: JSON.stringify(schedule) }}"
               >
                 <BaseButton
-                  :text="schedule.feedback ? 'Edit Feedback' : 'Add Feedback'"
+                  :text="schedule.feedback ? 'View Feedback' : 'Add Feedback'"
                   buttonType="primary"
                 />
               </RouterLink>
@@ -119,20 +122,19 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
-import { getSchedules } from '@/services/ScheduleService.js';
 import BaseButton from '@/components/shared/BaseButton.vue'
 import BaseChip from '@/components/shared/BaseChip.vue'
 import { MDYhmFormat } from '@/utils/DateFormat.js'
 import { CheckDate } from '@/utils/CheckDate.js'
-
-const schedules = ref([])
+import { useScheduleStore } from '@/stores/schedule';
 
 const route = useRoute()
 
-onMounted(async () => {
-  const { data } = await getSchedules(`candidate=${route.params.id}`);
-  schedules.value = data.data
+const scheduleStore = useScheduleStore()
+
+onMounted(() => {
+  scheduleStore.fetchSchedules(`candidate=${route.params.id}`)
 })
 </script>

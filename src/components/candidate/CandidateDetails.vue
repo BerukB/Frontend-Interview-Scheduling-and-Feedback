@@ -52,19 +52,12 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import CandidateSchedule from '@/components/candidate/details/CandidateSchedule.vue'
-import { getCandidateById } from '@/services/candidateService';
 
 const openTab = ref(2)
-const candidate = ref([])
 
 function toggleTabs(tabNumber) {
   openTab.value = tabNumber
 }
-
-onMounted(async () => {
-  const { data } = await getCandidateById('6565cf71c50ce7db8dc54ce4');
-  candidate.value = data
-})
 </script>

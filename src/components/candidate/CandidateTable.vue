@@ -20,6 +20,7 @@
           <tr
             v-for="candidate in candidateStore.candidates"
             :key="candidate._id"
+            class="group/row hover:bg-gray-50 transition-all duration-300"
           >
             <td class="table-data">
               <div class="text-sm">
@@ -48,23 +49,30 @@
             <td class="table-data">
               {{ DMYFormat(candidate.createdAt )}}
             </td>
-            <td
-              class="flex gap-3 px-6 py-4 text-right border-b border-gray-300"
-            >
-              <RouterLink to="">
-                <font-awesome-icon
-                  icon="fa-solid fa-calendar-plus"
-                  class="text-primary"
-                />
-              </RouterLink>
-              <RouterLink
-                :to="{name: 'CandidateDetails', params: {id: candidate._id}}"
+            <td class="border-b border-gray-300 w-32">
+              <div
+                class="invisible group-hover/row:visible flex gap-3 px-6 py-4 text-right"
               >
-                <font-awesome-icon
-                  icon="fa-solid fa-eye"
-                  class="text-secondary"
-                />
-              </RouterLink>
+                <RouterLink
+                  :to="{name: 'PhoneFeedback', params: {id: candidate._id}}"
+                >
+                  <font-awesome-icon icon="fa-solid fa-phone-flip" />
+                </RouterLink>
+                <RouterLink to="">
+                  <font-awesome-icon
+                    icon="fa-solid fa-calendar-plus"
+                    class="text-primary"
+                  />
+                </RouterLink>
+                <RouterLink
+                  :to="{name: 'CandidateDetails', params: {id: candidate._id}}"
+                >
+                  <font-awesome-icon
+                    icon="fa-solid fa-eye"
+                    class="text-secondary"
+                  />
+                </RouterLink>
+              </div>
             </td>
           </tr>
         </tbody>
