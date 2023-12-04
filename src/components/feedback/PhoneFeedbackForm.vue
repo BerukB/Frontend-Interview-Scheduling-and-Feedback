@@ -3,18 +3,17 @@
     <div class="flex justify-between mb-6 gap-6">
       <div class="w-full">
         <BaseInput
-          v-model="position"
+          v-model="schedule.position"
           label="Interview Position"
           type="text"
           name="position"
-          readonly
         />
       </div>
     </div>
     <div class="flex justify-between mb-6 gap-6">
       <div class="w-1/2">
         <BaseInput
-          v-model="date"
+          v-model="schedule.date"
           label="Interview Date"
           type="text"
           name="date"
@@ -23,47 +22,34 @@
       </div>
       <div class="w-1/2">
         <BaseInput
-          v-model="interviewer"
+          v-model="interviewer.label"
           label="Interviewer Name"
           type="text"
-          name="interviewer"
           readonly
+        />
+        <BaseInput
+          v-model="schedule.interviewer"
+          type="hidden"
+          name="interviewer"
         />
       </div>
     </div>
     <div class="mt-6">
       <h4 class="mt-10 font-bold text-sm">Please fill the below Information</h4>
       <hr class="mt-4 mb-10" />
-      <div class="flex justify-between mb-6 gap-6">
-        <div class="w-1/2">
-          <BaseInput
-            v-model="state.typingTestResult"
-            label="Typing Test Result"
-            type="text"
-            name="typingTestResult"
-          />
-        </div>
-        <div class="w-1/2">
-          <BaseInput
-            v-model="state.testGorillaResult"
-            label="Test Gorilla Result"
-            type="text"
-            name="testGorillaResult"
-          />
-        </div>
-      </div>
+
       <div class="flex justify-between mb-6 gap-6">
         <div class="w-1/2">
           <BaseSelect
             :options="educationalStatusOptions"
-            v-model="state.educationalStatus"
+            v-model="feedback.educationalStatus"
             label="Educational Status"
           />
         </div>
         <div class="w-1/2">
           <BaseSelect
             :options="workStatusOptions"
-            v-model="state.workStatus"
+            v-model="feedback.workStatus"
             label="Work Status"
           />
         </div>
@@ -74,7 +60,7 @@
             >Willingness to work in rotational shifts</label
           >
           <BaseRadioGroup
-            v-model="state.rotationalShift"
+            v-model="feedback.rotationalShift"
             name="rotationalShift"
             :options="BooleanOptions"
             vertical
@@ -85,7 +71,7 @@
             >Willingness to work on the weekends</label
           >
           <BaseRadioGroup
-            v-model="state.weekend"
+            v-model="feedback.weekend"
             name="weekend"
             :options="BooleanOptions"
             vertical
@@ -98,7 +84,7 @@
             >Willingness to commit to 1 month training</label
           >
           <BaseRadioGroup
-            v-model="state.training"
+            v-model="feedback.training"
             name="training"
             :options="BooleanOptions"
             vertical
@@ -107,7 +93,7 @@
         <div class="w-1/2">
           <label class="block text-sm mb-2">3 Months Contract awareness</label>
           <BaseRadioGroup
-            v-model="state.threeMonthContract"
+            v-model="feedback.threeMonthContract"
             name="threeMonthContract"
             :options="BooleanOptions"
             vertical
@@ -118,7 +104,7 @@
         <div class="w-1/2">
           <label class="block text-sm mb-2">Salary</label>
           <BaseRadioGroup
-            v-model="state.salary"
+            v-model="feedback.salary"
             name="salary"
             :options="BooleanOptions"
             vertical
@@ -127,7 +113,7 @@
         <div class="w-1/2">
           <label class="block text-sm mb-2">Kebele ID Possession</label>
           <BaseRadioGroup
-            v-model="state.kebeleID"
+            v-model="feedback.kebeleID"
             name="kebeleID"
             :options="BooleanOptions"
             vertical
@@ -138,15 +124,8 @@
         <div class="w-1/2">
           <BaseSelect
             :options="resultOptions"
-            v-model="state.result"
+            v-model="feedback.result"
             label="Result"
-          />
-        </div>
-        <div class="w-1/2">
-          <BaseSelect
-            :options="resultOptions"
-            v-model="state.enockResult"
-            label="Enock Result"
           />
         </div>
       </div>
@@ -156,7 +135,7 @@
             >Personal Feedback</label
           >
           <textarea
-            v-model="state.personalFeedback"
+            v-model="feedback.personalFeedback"
             name="personalFeedback"
             cols="30"
             rows="10"
@@ -178,47 +157,44 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref, toRefs } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import BaseInput from '@/components/shared/BaseInput.vue';
 import BaseSelect from '@/components/shared/BaseSelect.vue';
 import BaseButton from '@/components/shared/BaseButton.vue';
 import BaseRadioGroup from '@/components/shared/BaseRadioGroup.vue';
 import { MDYhmFormat } from '@/utils/DateFormat.js'
-import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+import { useRoute, useRouter } from 'vue-router';
 import { useScheduleStore } from '@/stores/schedule';
 
 const router = useRouter()
+const route = useRoute()
 
-const props = defineProps({
-  schedule: {
-    type: Object
-  }
-})
-
-const { schedule } = toRefs(props)
-
-const position = ref(schedule.value.position)
-const date = ref(MDYhmFormat(schedule.value.date))
-
+const authstore = useAuthStore()
 
 const interviewer = computed(() => {
-  return `${schedule.value.interviewer.firstName} ${schedule.value.interviewer.lastName}`
+  return {label: `${authstore.user.firstName} ${authstore.user.lastName}`, value: authstore.user._id}
 })
 
-const state = reactive({
-    result: schedule.value.feedback?.result || '',
-    enockResult: schedule.value.feedback?.enockResult || '',
-    typingTestResult: schedule.value.feedback?.typingTestResult || '',
-    testGorillaResult: schedule.value.feedback?.testGorillaResult || '',
-    educationalStatus: schedule.value.feedback?.educationalStatus || '',
-    workStatus: schedule.value.feedback?.workStatus || '',
-    rotationalShift: schedule.value.feedback?.rotationalShift,
-    weekend: schedule.value.feedback?.weekend,
-    training: schedule.value.feedback?.training,
-    threeMonthContract: schedule.value.feedback?.threeMonthContract,
-    salary: schedule.value.feedback?.salary,
-    kebeleID: schedule.value.feedback?.kebeleID,
-    personalFeedback: schedule.value.feedback?.personalFeedback
+const schedule = reactive({
+  date: ref(MDYhmFormat(Date.now())),
+  interviewType: 'Phone',
+  position: '',
+  interviewer: interviewer.value.value,
+  candidate: route.params.id
+})
+
+const feedback = reactive({
+    result: '',
+    educationalStatus: '',
+    workStatus: '',
+    rotationalShift: '',
+    weekend: '',
+    training: '',
+    threeMonthContract: '',
+    salary: '',
+    kebeleID: '',
+    personalFeedback: ''
 })
 
 const resultOptions = ref([
@@ -248,15 +224,10 @@ const BooleanOptions = ref([
   {label: 'No', value: false}
 ])
 
-const feedbackData = {
-  attendance: 'Came',
-  feedback: state
-}
-
 const scheduleStore = useScheduleStore()
 
 function submit() {
-  scheduleStore.editSchedule(schedule.value._id, feedbackData)
+  scheduleStore.addSchedule({...schedule, feedback})
   router.back()
 }
 

@@ -12,8 +12,8 @@ const createSchedule = (data) => {
   return apiClient.post('/schedules', data);
 };
 
-const updateSchedule = (data) => {
-  return apiClient.patch('/schedules', data);
+const updateSchedule = (id, data) => {
+  return apiClient.patch(`/schedules/${id}`, data);
 };
 
 export { getSchedules, getScheduleById, createSchedule, updateSchedule };
