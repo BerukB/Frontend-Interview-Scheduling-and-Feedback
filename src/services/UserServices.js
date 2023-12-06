@@ -30,6 +30,9 @@ const getCandidate = () => {
     },
   });
 };
+const getCandidateById = (id) => {
+  return apiClient.get(`/users/${id}`);
+};
 
 export {
   getUsers,
@@ -38,4 +41,5 @@ export {
   updateUser,
   getInterviewer,
   getCandidate,
+  getCandidateById,
 };

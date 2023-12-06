@@ -9,8 +9,8 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'Schedule',
-      component: ScheduleView,
+      name: '',
+      component: '',
     },
     {
       path: '/feedback',
@@ -26,6 +26,11 @@ const router = createRouter({
       path: '/candidates/:id',
       name: 'CandidateDetails',
       component: CandidateDetailsView,
+    },
+    {
+      path: '/schedules',
+      name: 'Schedule',
+      component: ScheduleView,
     },
   ],
 });
