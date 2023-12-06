@@ -23,11 +23,9 @@ const showPopup = computed(() => scheduleStore.getPopupValue);
 const isEventsListSet = ref(false);
 const schedulesList = ref([]);
 
-console.log("isEventsListSetbefore", isEventsListSet.value);
 
 const openPopup = () =>{
  scheduleStore.setPopupValue(true);
- console.log("showpop",showPopup.value)
 }
 
 
@@ -115,6 +113,10 @@ console.log("EventsList",  eventsList.value);
 
 <style scoped>
 .fc-event {
-  height: 50px !important; /* adjust the value as needed */
+  height: 50px ; /* adjust the value as needed */
+}
+.fc .fc-event-container {
+  background-color: #000000;
+  color: #ff0000;
 }
 </style>

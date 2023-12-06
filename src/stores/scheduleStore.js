@@ -7,6 +7,7 @@ import { getSchedules } from '../services/ScheduleService';
 export const useScheduleStore = defineStore('schedule', {
   state: () => ({
     events: ref([]),
+    myEvents: ref([]),
     clientList: ref([]),
     interviewerList: ref([]),
     candidateList: ref([]),
@@ -17,6 +18,9 @@ export const useScheduleStore = defineStore('schedule', {
   getters: {
     getEvents() {
       return this.events.value;
+    },
+    getMyEvents() {
+      return this.myEvents.value;
     },
     getClientList() {
       return this.clientList.value;
@@ -39,8 +43,10 @@ export const useScheduleStore = defineStore('schedule', {
   },
   actions: {
     setEvents(event) {
-      // this.events.push(event);
       this.events.value = event;
+    },
+    setMyEvents(event) {
+      this.myEvents.value = event;
     },
     async setSchedules() {
       const result = await getSchedules();
@@ -80,8 +86,6 @@ export const useScheduleStore = defineStore('schedule', {
       try {
         const result = await getCandidateById(id);
         this.candidate.push(result.data);
-        // this.candidate.value = result.data;
-        console.log("mmmmmmmmmmmmmm", result.data);
       } catch (error) {
         console.error('Error in POST request:', error);
       }
