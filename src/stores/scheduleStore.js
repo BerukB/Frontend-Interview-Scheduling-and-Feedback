@@ -1,21 +1,26 @@
 import { defineStore } from 'pinia';
 import { getClients } from '../services/clientService';
-import { getInterviewer, getCandidate } from '../services/UserServices';
+import { getInterviewer, getCandidate, getCandidateById } from '../services/UserServices';
 import { ref } from 'vue';
 import { getSchedules } from '../services/ScheduleService';
 
 export const useScheduleStore = defineStore('schedule', {
   state: () => ({
     events: ref([]),
+    myEvents: ref([]),
     clientList: ref([]),
     interviewerList: ref([]),
     candidateList: ref([]),
     showPopup: ref(false),
     schedules: ref([]),
+    candidate: ref([]),
   }),
   getters: {
     getEvents() {
       return this.events.value;
+    },
+    getMyEvents() {
+      return this.myEvents.value;
     },
     getClientList() {
       return this.clientList.value;
@@ -26,6 +31,9 @@ export const useScheduleStore = defineStore('schedule', {
     getCandidateList() {
       return this.candidateList.value;
     },
+    getCandidate() {
+      return this.candidate;
+    },
     getPopupValue() {
       return this.showPopup;
     },
@@ -35,8 +43,10 @@ export const useScheduleStore = defineStore('schedule', {
   },
   actions: {
     setEvents(event) {
-      // this.events.push(event);
       this.events.value = event;
+    },
+    setMyEvents(event) {
+      this.myEvents.value = event;
     },
     async setSchedules() {
       const result = await getSchedules();
@@ -68,6 +78,14 @@ export const useScheduleStore = defineStore('schedule', {
         const result = await getCandidate();
 
         this.candidateList.value = result.data.data;
+      } catch (error) {
+        console.error('Error in POST request:', error);
+      }
+    },
+    async setCandidateById(id) {
+      try {
+        const result = await getCandidateById(id);
+        this.candidate.push(result.data);
       } catch (error) {
         console.error('Error in POST request:', error);
       }

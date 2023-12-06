@@ -12,9 +12,8 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'Schedule',
-      component: ScheduleView,
-      meta: { requiresAuth: true },
+      name: 'Home',
+      component: '',
     },
     {
       path: '/feedback',
@@ -46,6 +45,12 @@ const router = createRouter({
       path: '/login',
       name: 'Login',
       component: LoginView,
+    },
+    {
+      path: '/schedules',
+      name: 'Schedule',
+      component: ScheduleView,
+      meta: { requiresAuth: true },
     },
   ],
 });

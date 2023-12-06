@@ -23,11 +23,9 @@ const showPopup = computed(() => scheduleStore.getPopupValue);
 const isEventsListSet = ref(false);
 const schedulesList = ref([]);
 
-console.log("isEventsListSetbefore", isEventsListSet.value);
 
 const openPopup = () =>{
  scheduleStore.setPopupValue(true);
- console.log("showpop",showPopup.value)
 }
 
 
@@ -42,7 +40,7 @@ const openPopup = () =>{
 // }
 
 
-let calendarOptions = {
+let calendarOptions =ref({
   plugins:[DayGridPlugin,TimeGridPlugin,InteractionPlugin,ListPlugin,resourceTimelinePlugin ],
   initialView: 'timeGridWeek',
   headerToolbar: {
@@ -57,7 +55,7 @@ let calendarOptions = {
   // select: handleSelect,
   // eventClick: handleClick,
 
-}
+});
 
 
 onMounted(async () => {
@@ -85,29 +83,12 @@ console.log("SCHE", scheduleStore.getSchedules)
       return eventData;
     });
     scheduleStore.setEvents(allEvents);
-    isEventsListSet.value = true;
+
 
     eventsList.value = scheduleStore.getEvents;
-
-    calendarOptions = {
-  plugins:[DayGridPlugin,TimeGridPlugin,InteractionPlugin,ListPlugin,resourceTimelinePlugin ],
-  initialView: 'timeGridWeek',
-  headerToolbar: {
-    left: 'title',
-    center: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-    right: 'prev today next',
-  },
-  selectable: false,
-  events: eventsList.value,
-  themeSystem: 'bootstrap5',
-  backgroundColor: 'rgb(0, 98, 255)',
-  // select: handleSelect,
-  // eventClick: handleClick,
-
-}
-
+    isEventsListSet.value = true;
     console.log("isEventsListSetmount", isEventsListSet.value);
-
+    calendarOptions.value.events = eventsList.value;
   } catch (error) {
     console.error('Error fetching events:', error);
   }
@@ -125,9 +106,17 @@ console.log("EventsList",  eventsList.value);
       </button>
     </div>
 
-    <Fullcalendar v-if="isEventsListSet" :options="calendarOptions" />
+    <Fullcalendar v-if="isEventsListSet" :options="calendarOptions" ref="calendarRef"/>
     <PopUp v-show="showPopup" />
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.fc-event {
+  height: 50px ; /* adjust the value as needed */
+}
+.fc .fc-event-container {
+  background-color: #000000;
+  color: #ff0000;
+}
+</style>

@@ -58,12 +58,12 @@
                 >
                   <font-awesome-icon icon="fa-solid fa-phone-flip" />
                 </RouterLink>
-                <RouterLink to="">
-                  <font-awesome-icon
-                    icon="fa-solid fa-calendar-plus"
-                    class="text-primary"
-                  />
-                </RouterLink>
+                 <div @click="openPopup(candidate.user?._id)">
+                <font-awesome-icon
+                  icon="fa-solid fa-calendar-plus"
+                  class="text-primary hover:text-secondary"
+                />
+              </div>
                 <RouterLink
                   :to="{name: 'CandidateDetails', params: {id: candidate._id}}"
                 >
@@ -74,22 +74,34 @@
                 </RouterLink>
               </div>
             </td>
+           
           </tr>
         </tbody>
       </table>
       <TableSkeleton v-if="isLoading" />
     </div>
   </div>
+  <PopUp v-show="showPopup" 
+  :candidateId="candidateId"/>
 </template>
 
 <script setup>
 import { RouterLink } from 'vue-router';
 import BaseChip from '@/components/shared/BaseChip.vue'
-import { onMounted } from 'vue';
+
+import { onMounted, ref, computed } from 'vue';
 import { useCandidateStore } from '@/stores/candidate';
 import { DMYFormat } from '@/utils/DateFormat.js'
+import PopUp from '../PopUp.vue'
+import { useScheduleStore } from '@/stores/scheduleStore';
 import TableSkeleton from '@/components/skeleton/TableSkeleton.vue';
 import { storeToRefs } from 'pinia'
+
+const scheduleStore = useScheduleStore();
+const candidates = ref([])
+const showPopup = computed(() => scheduleStore.getPopupValue);
+const candidateId = ref();
+// console.log("showpop",showPopup.value)
 
 const candidateStore = useCandidateStore()
 
@@ -98,10 +110,25 @@ const { candidates, isLoading }= storeToRefs(candidateStore)
 onMounted(() => {
     candidateStore.fetchCandidates()
 })
+
+// const openPopup = (id) =>{
+ 
+//  candidateId.value = id;
+//  showPopup.value = true;
+//  console.log("showpop", candidateId.value)
+//  console.log("showpop2", id)
+// }
+const openPopup = (id) =>{
+  candidateId.value = id;
+ scheduleStore.setPopupValue(true);
+ console.log("showpop",showPopup.value)
+}
+
 </script>
 
 <style>
 .table-data {
     @apply px-6 py-4 border-b border-gray-300 text-sm
 }
+
 </style>
