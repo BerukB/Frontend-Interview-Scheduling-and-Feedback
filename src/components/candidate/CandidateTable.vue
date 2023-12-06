@@ -16,10 +16,11 @@
             <th class="px-6 py-3 border-b-2 "></th>
           </tr>
         </thead>
-        <tbody class="bg-white">
+        <tbody class="bg-white" v-if="!isLoading">
           <tr
-            v-for="candidate in candidateStore.candidates"
+            v-for="candidate in candidates"
             :key="candidate._id"
+            class="group/row hover:bg-gray-50 transition-all duration-300"
           >
             <td class="table-data">
               <div class="text-sm">
@@ -48,29 +49,36 @@
             <td class="table-data">
               {{ DMYFormat(candidate.createdAt )}}
             </td>
-            <td
-              class="flex gap-3 px-6 py-4 text-right border-b border-gray-300"
-            >
-       
-              <div @click="openPopup(candidate.user?._id)">
+            <td class="border-b border-gray-300 w-32">
+              <div
+                class="invisible group-hover/row:visible flex gap-3 px-6 py-4 text-right"
+              >
+                <RouterLink
+                  :to="{name: 'PhoneFeedback', params: {id: candidate._id}}"
+                >
+                  <font-awesome-icon icon="fa-solid fa-phone-flip" />
+                </RouterLink>
+                 <div @click="openPopup(candidate.user?._id)">
                 <font-awesome-icon
                   icon="fa-solid fa-calendar-plus"
                   class="text-primary hover:text-secondary"
                 />
               </div>
-              <RouterLink
-                :to="{name: 'CandidateDetails', params: {id: candidate._id}}"
-              >
-                <font-awesome-icon
-                  icon="fa-solid fa-eye"
-                  class="text-secondary hover:text-primary"
-                />
-              </RouterLink>
+                <RouterLink
+                  :to="{name: 'CandidateDetails', params: {id: candidate._id}}"
+                >
+                  <font-awesome-icon
+                    icon="fa-solid fa-eye"
+                    class="text-secondary"
+                  />
+                </RouterLink>
+              </div>
             </td>
            
           </tr>
         </tbody>
       </table>
+      <TableSkeleton v-if="isLoading" />
     </div>
   </div>
   <PopUp v-show="showPopup" 
@@ -80,21 +88,27 @@
 <script setup>
 import { RouterLink } from 'vue-router';
 import BaseChip from '@/components/shared/BaseChip.vue'
+
 import { onMounted, ref, computed } from 'vue';
 import { useCandidateStore } from '@/stores/candidate';
 import { DMYFormat } from '@/utils/DateFormat.js'
 import PopUp from '../PopUp.vue'
 import { useScheduleStore } from '@/stores/scheduleStore';
+import TableSkeleton from '@/components/skeleton/TableSkeleton.vue';
+import { storeToRefs } from 'pinia'
 
 const scheduleStore = useScheduleStore();
 const candidates = ref([])
 const showPopup = computed(() => scheduleStore.getPopupValue);
 const candidateId = ref();
 // console.log("showpop",showPopup.value)
+
 const candidateStore = useCandidateStore()
 
+const { candidates, isLoading }= storeToRefs(candidateStore)
+
 onMounted(() => {
-    candidates.value = candidateStore.fetchCandidates()
+    candidateStore.fetchCandidates()
 })
 
 // const openPopup = (id) =>{

@@ -1,7 +1,7 @@
 <template>
   <h3 class="font-bold mb-4">Schedules</h3>
   <hr />
-
+  <ScheduleSkeleton v-if="isLoading" />
   <ol class="border-l-2 border-secondary border-opacity-25 mt-10">
     <li v-for="schedule in schedules" :key="schedule._id">
       <div class="flex-start md:flex">
@@ -30,6 +30,11 @@
             type="warning"
           />
           <BaseChip
+            v-if="schedule.interviewType == 'Phone'"
+            :text="schedule.interviewType"
+            type="info"
+          />
+          <BaseChip
             v-else-if="schedule.interviewType == 'Client'"
             :text="schedule.interviewType"
             type="success"
@@ -45,6 +50,13 @@
             v-if="schedule.attendance == 'Absent'"
             :text="schedule.attendance"
             type="danger"
+            class="mx-2"
+          />
+
+          <BaseChip
+            v-if="schedule.attendance == 'Pending'"
+            :text="schedule.attendance"
+            type="warning"
             class="mx-2"
           />
 
@@ -71,15 +83,6 @@
                   {{ schedule.interviewer?.lastName }}</span
                 >
               </li>
-              <li class="flex items-center">
-                <font-awesome-icon
-                  icon="fa-solid fa-circle-check"
-                  class="text-xs"
-                />
-
-                <span class="mx-2">Attendance:</span>
-                <span>{{ schedule.attendance }}</span>
-              </li>
 
               <li class="flex items-center">
                 <font-awesome-icon
@@ -97,10 +100,19 @@
             <div
               class="mt-4 invisible group-hover/list:visible transition-all duration\"
             >
-              <RouterLink to="/feedback">
-                <BaseButton text="Add Feedback" buttonType="primary" />
+              <RouterLink
+                :to="{name: 'Feedback', query: { schedule: JSON.stringify(schedule) }}"
+              >
+                <BaseButton
+                  :text="schedule.feedback ? 'View Feedback' : 'Add Feedback'"
+                  buttonType="primary"
+                />
               </RouterLink>
-              <BaseButton text=" Cancel" buttonType="secondary" />
+              <BaseButton
+                v-if="CheckDate(schedule.date) && !schedule.feedback"
+                text=" Cancel"
+                buttonType="secondary"
+              />
             </div>
           </div>
         </div>
@@ -110,18 +122,23 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
-import { RouterLink } from 'vue-router';
-import { getSchedules } from '@/services/ScheduleService.js';
+import { onMounted } from 'vue';
+import { RouterLink, useRoute } from 'vue-router';
 import BaseButton from '@/components/shared/BaseButton.vue'
 import BaseChip from '@/components/shared/BaseChip.vue'
 import { MDYhmFormat } from '@/utils/DateFormat.js'
+import { CheckDate } from '@/utils/CheckDate.js'
+import { useScheduleStore } from '@/stores/schedule';
+import ScheduleSkeleton from '../../skeleton/ScheduleSkeleton.vue';
+import { storeToRefs } from 'pinia';
 
-const schedules = ref([])
+const route = useRoute()
 
-onMounted(async () => {
-  const { data } = await getSchedules('candidate=6565cf21c50ce7db8dc54cd7');
-  console.log("CANDIDATE:", data.data);
-  schedules.value = data.data
+const scheduleStore = useScheduleStore()
+
+const { schedules, isLoading } = storeToRefs(scheduleStore)
+
+onMounted(() => {
+  scheduleStore.fetchSchedules(`candidate=${route.params.id}`)
 })
 </script>

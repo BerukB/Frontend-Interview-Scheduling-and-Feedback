@@ -1,18 +1,55 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { getSchedules } from '@/services/ScheduleService';
+import {
+  getSchedules,
+  updateSchedule,
+  createSchedule,
+} from '@/services/ScheduleService';
+import { NotificationToast } from '@/utils/NotificationToast';
 
-export const useScheduleStore = defineStore('schedule', () => {
+export const useScheduleStore = defineStore('scheduleStore', () => {
   const schedules = ref([]);
+  const isLoading = ref(false);
+  const error = ref('');
 
-  async function fetchSchedules() {
-    const { data } = await getSchedules();
-    schedules.value = data.data;
+  async function fetchSchedules(params = '') {
+    isLoading.value = true;
+    try {
+      const { data } = await getSchedules(params);
+      schedules.value = data.data;
+    } catch (err) {
+      error.value = err.response.data.message || 'Error';
+      NotificationToast(error, 'error');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  //   const filterInterviewer = computed(() =>
-  //   schedules.value.filter((user) => user.role == 'Interviewer')
-  //   );
+  async function addSchedule(_data) {
+    isLoading.value = true;
+    try {
+      const { data } = await createSchedule(_data);
+      data ? NotificationToast('Phone Feedback Added!', 'success') : '';
+    } catch (err) {
+      error.value = err.response?.data?.message || 'Error';
+      NotificationToast(error, 'error');
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
-  return { schedules, fetchSchedules };
+  async function editSchedule(id, data) {
+    isLoading.value = true;
+    try {
+      await updateSchedule(id, data);
+      NotificationToast('Feedback Saved!', 'success');
+    } catch (err) {
+      error.value = err.response.data.message || 'Error';
+      NotificationToast(error, 'error');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  return { schedules, fetchSchedules, editSchedule, addSchedule, isLoading };
 });
