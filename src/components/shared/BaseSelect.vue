@@ -17,6 +17,15 @@
         {{ option.label }}
       </option>
     </select>
+    <template v-if="validation && validation.$errors">
+      <span
+        v-for="error in validation.$errors"
+        :key="error.$uid"
+        class="text-red-600 text-sm"
+      >
+        {{ error.$message }}
+      </span>
+    </template>
   </div>
 </template>
 
@@ -34,6 +43,9 @@ export default {
     options: {
       type: Array,
       required: true
+    },
+    validation: {
+      type: Object
     }
   }
 }

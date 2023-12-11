@@ -13,6 +13,7 @@ import {
   faCalendarPlus,
   faCircleCheck,
   faPhoneFlip,
+  faTriangleExclamation,
 } from '@fortawesome/free-solid-svg-icons';
 import { faCalendar, faCircleXmark } from '@fortawesome/free-regular-svg-icons';
 
@@ -36,7 +37,8 @@ library.add(
   faCalendarPlus,
   faCircleCheck,
   faCircleXmark,
-  faPhoneFlip
+  faPhoneFlip,
+  faTriangleExclamation
 );
 
 app.component('font-awesome-icon', FontAwesomeIcon);
