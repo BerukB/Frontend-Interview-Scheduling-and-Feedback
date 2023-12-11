@@ -58,6 +58,7 @@
             :options="educationalStatusOptions"
             v-model="state.educationalStatus"
             label="Educational Status"
+            :validation="v$.educationalStatus"
           />
         </div>
         <div class="w-1/2">
@@ -65,6 +66,7 @@
             :options="workStatusOptions"
             v-model="state.workStatus"
             label="Work Status"
+            :validation="v$.workStatus"
           />
         </div>
       </div>
@@ -78,6 +80,7 @@
             name="rotationalShift"
             :options="BooleanOptions"
             vertical
+            :validation="v$.rotationalShift"
           />
         </div>
         <div class="w-1/2">
@@ -89,6 +92,7 @@
             name="weekend"
             :options="BooleanOptions"
             vertical
+            :validation="v$.weekend"
           />
         </div>
       </div>
@@ -102,6 +106,7 @@
             name="training"
             :options="BooleanOptions"
             vertical
+            :validation="v$.training"
           />
         </div>
         <div class="w-1/2">
@@ -111,6 +116,7 @@
             name="threeMonthContract"
             :options="BooleanOptions"
             vertical
+            :validation="v$.threeMonthContract"
           />
         </div>
       </div>
@@ -122,6 +128,7 @@
             name="salary"
             :options="BooleanOptions"
             vertical
+            :validation="v$.salary"
           />
         </div>
         <div class="w-1/2">
@@ -131,6 +138,7 @@
             name="kebeleID"
             :options="BooleanOptions"
             vertical
+            :validation="v$.kebeleID"
           />
         </div>
       </div>
@@ -140,6 +148,7 @@
             :options="resultOptions"
             v-model="state.result"
             label="Result"
+            :validation="v$.result"
           />
         </div>
         <div class="w-1/2">
@@ -186,6 +195,8 @@ import BaseRadioGroup from '@/components/shared/BaseRadioGroup.vue';
 import { MDYhmFormat } from '@/utils/DateFormat.js'
 import { useRouter } from 'vue-router';
 import { useScheduleStore } from '@/stores/schedule';
+import { feedbackValidation } from '@/validations/feedback';
+import useVuelidate from '@vuelidate/core'
 
 const router = useRouter()
 
@@ -253,11 +264,18 @@ const feedbackData = {
   feedback: state
 }
 
+const v$ = useVuelidate(feedbackValidation(), state)
+
 const scheduleStore = useScheduleStore()
 
-function submit() {
-  scheduleStore.editSchedule(schedule.value._id, feedbackData)
-  router.back()
+async function submit() {
+  const isvalid = await v$.value.$validate()
+  if (isvalid) {
+    scheduleStore.editSchedule(schedule.value._id, feedbackData)
+    router.back()
+  } else {
+    console.log('Validation Error')
+  }
 }
 
 function cancel() {
