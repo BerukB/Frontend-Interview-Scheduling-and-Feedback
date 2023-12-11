@@ -10,8 +10,5 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router';
 import CandidateDetails from '@/components/candidate/CandidateDetails.vue'
-
-const route = useRoute()
 </script>

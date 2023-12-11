@@ -12,6 +12,8 @@
       :value="option.value"
       :modelValue="modelValue"
       :name="name"
+      :id="
+      `${name}-${option.value}`"
       @update:modelValue="$emit('update:modelValue', $event)"
     />
   </component>
@@ -30,7 +32,7 @@ defineProps({
       required: true
     },
     modelValue: {
-      type: [String, Number],
+      type: [String, Number, Boolean],
       required: true
     },
     vertical: {
