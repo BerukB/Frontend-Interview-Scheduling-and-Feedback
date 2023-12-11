@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { getClients } from '../services/clientService';
-import { getInterviewer, getCandidate, getCandidateById } from '../services/UserServices';
+import { getInterviewer } from '../services/UserServices';
+import {getCandidates, getCandidateById} from '../services/CandidateService'
 import { ref } from 'vue';
 import { getSchedules } from '../services/ScheduleService';
 
@@ -14,6 +15,7 @@ export const useScheduleStore = defineStore('schedule', {
     showPopup: ref(false),
     schedules: ref([]),
     candidate: ref([]),
+    currentCandidateId: ref(null),
   }),
   getters: {
     getEvents() {
@@ -40,6 +42,9 @@ export const useScheduleStore = defineStore('schedule', {
     getSchedules() {
       return this.schedules.value;
     },
+    getCurrentCandidateID() {
+      return this.currentCandidateId;
+    },
   },
   actions: {
     setEvents(event) {
@@ -48,12 +53,19 @@ export const useScheduleStore = defineStore('schedule', {
     setMyEvents(event) {
       this.myEvents.value = event;
     },
+    setCurrentCandidateID(id) {
+      this.currentCandidateId = id;
+    },
     async setSchedules() {
       const result = await getSchedules();
       this.schedules.value = result.data.data;
     },
     setPopupValue(value) {
       this.showPopup = value;
+    },
+    setCandiateToEmpty() {
+      this.candidate = [];
+      console.log("bang", this.candidate.value);
     },
     async setClientList() {
       try {
@@ -73,9 +85,19 @@ export const useScheduleStore = defineStore('schedule', {
         console.error('Error in POST request:', error);
       }
     },
+    // async setCandidateList() {
+    //   try {
+    //     const result = await getCandidate();
+
+    //     this.candidateList.value = result.data.data;
+    //   } catch (error) {
+    //     console.error('Error in POST request:', error);
+    //   }
+    // },
+    
     async setCandidateList() {
       try {
-        const result = await getCandidate();
+        const result = await getCandidates();
 
         this.candidateList.value = result.data.data;
       } catch (error) {
