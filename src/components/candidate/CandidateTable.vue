@@ -92,13 +92,13 @@ import BaseChip from '@/components/shared/BaseChip.vue'
 import { onMounted, ref, computed } from 'vue';
 import { useCandidateStore } from '@/stores/candidate';
 import { DMYFormat } from '@/utils/DateFormat.js'
-import PopUp from '../PopUp.vue'
+import PopUp from '@/components/PopUp.vue'
 import { useScheduleStore } from '@/stores/scheduleStore';
 import TableSkeleton from '@/components/skeleton/TableSkeleton.vue';
 import { storeToRefs } from 'pinia'
 
 const scheduleStore = useScheduleStore();
-const candidates = ref([])
+//const candidates = ref([])
 const showPopup = computed(() => scheduleStore.getPopupValue);
 const candidateId = ref();
 // console.log("showpop",showPopup.value)
