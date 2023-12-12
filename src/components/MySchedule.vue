@@ -6,15 +6,12 @@ import InteractionPlugin from '@fullcalendar/interaction'
 import ListPlugin from '@fullcalendar/list'
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline'
 
-
-// import 'bootstrap/dist/css/bootstrap.css';
-// import 'bootstrap-icons/font/bootstrap-icons.css';
-// // import { Calendar } from '@fullcalendar/core';
-// import bootstrap5Plugin from '@fullcalendar/bootstrap5';
-
 import { ref, onMounted, computed } from 'vue'
 import { useScheduleStore } from '../stores/scheduleStore';
 import { useAuthStore } from '@/stores/auth'
+import {useEventStore} from '../stores/eventStore';
+
+const eventStore = useEventStore();
 import PopUp from './PopUp.vue'
 
 const scheduleStore = useScheduleStore();
@@ -26,23 +23,19 @@ const schedulesList = ref([]);
 const { user } = useAuthStore();
 const interviewerId = user._id;
 
-console.log("form events", user._id);
-// const openPopup = () =>{
-//  scheduleStore.setPopupValue(true);
-// }
-
-
-// const handleSelect = (arg) => {
-//   console.log(arg);
-//   scheduleStore.setEvents({
-//     title: "something",
-//     start: arg.start,
-//     end: arg.end,
-//     allDay: arg.allDay
-//   })
-// }
 const handleClick = (arg) => {
-    console.log(arg);
+    fetchSchedueById(arg.event.id)
+
+    
+};
+const fetchSchedueById = async (id) => {
+  try {
+    await eventStore.setScheduleById(id);
+    scheduleStore.setPopupValue(true);
+    console.log("printing schedule", eventStore.getScheduleById);
+  } catch (error) {
+    console.error('Error in fetchScheduleById:', error);
+  }
 };
 
 let calendarOptions =ref({
@@ -55,8 +48,6 @@ let calendarOptions =ref({
   },
   selectable: true,
   events: eventsList.value,
-  themeSystem: 'bootstrap5',
-  backgroundColor: 'rgb(0, 98, 255)',
   // select: handleSelect,
    eventClick: handleClick,
 
@@ -76,7 +67,6 @@ onMounted(async () => {
     .filter(event => {
         const me = event.interviewer._id
         // Log the interviewer value for each event during filtering
-        console.log("Interviewer ID (Filter):", me);
         return me === interviewerId;
       })
     .map(event => {
@@ -89,6 +79,10 @@ onMounted(async () => {
         start: startDate,
         end: endDate,
         allDay: false,
+        candidate: event.candidate,
+        client: event.client,
+        interviewer: event.interviewer,
+        interviewType: event.interviewType,
         // Add other properties as needed
       };
 
@@ -99,7 +93,6 @@ onMounted(async () => {
 
     eventsList.value = scheduleStore.getEvents;
     isEventsListSet.value = true;
-    console.log("isEventsListSetmount", isEventsListSet.value);
     calendarOptions.value.events = eventsList.value;
   } catch (error) {
     console.error('Error fetching events:', error);
@@ -107,19 +100,13 @@ onMounted(async () => {
 
 
 });
-console.log("EventsList",  eventsList.value);
+
 </script>
 
 <template>
   <div class="px-10 bg-red ">
-    <!-- <div class="flex justify-end ">
-      <button @click="openPopup" class="p-2 mb-3 bg-orange-400 text-white">
-        New Schedule
-      </button>
-    </div> -->
-
     <Fullcalendar v-if="isEventsListSet" :options="calendarOptions" ref="calendarRef"/>
-    <PopUp v-show="showPopup" />
+    <PopUp v-if="showPopup" />
   </div>
 </template>
 

@@ -58,7 +58,7 @@
                 >
                   <font-awesome-icon icon="fa-solid fa-phone-flip" />
                 </RouterLink>
-                 <div @click="openPopup(candidate.user?._id)">
+                 <div @click="openPopup(candidate._id)">
                 <font-awesome-icon
                   icon="fa-solid fa-calendar-plus"
                   class="text-primary hover:text-secondary"
@@ -89,7 +89,7 @@
 import { RouterLink } from 'vue-router';
 import BaseChip from '@/components/shared/BaseChip.vue'
 
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, computed,ref } from 'vue';
 import { useCandidateStore } from '@/stores/candidate';
 import { DMYFormat } from '@/utils/DateFormat.js'
 import PopUp from '../PopUp.vue'
@@ -112,7 +112,7 @@ onMounted(() => {
 })
 
 const openPopup = (id) =>{
-  // candidateId.value = id;
+   candidateId.value = id;
   scheduleStore.setCurrentCandidateID(id); 
  scheduleStore.setPopupValue(true);
  console.log("showpop",showPopup.value)

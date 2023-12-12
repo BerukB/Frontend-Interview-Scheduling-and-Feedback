@@ -5,8 +5,6 @@ import PhoneFeedbackView from '@/views/PhoneFeedbackView.vue';
 import CandidateView from '@/views/CandidateView.vue';
 import CandidateDetailsView from '@/views/CandidateDetailsView.vue';
 import LoginView from '@/views/LoginView.vue';
-import { useAuthStore } from '@/stores/auth';
-import LoginView from '@/views/LoginView.vue';
 import MyScheduleView from '@/views/MyScheduleView.vue';
 import { useAuthStore } from '@/stores/auth';
 
