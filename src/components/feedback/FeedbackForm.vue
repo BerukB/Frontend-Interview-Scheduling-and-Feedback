@@ -160,6 +160,16 @@
         </div>
       </div>
       <div class="flex justify-between mb-6 gap-6">
+        <div class="w-1/2">
+          <BaseSelect
+            :options="recommendedClientOptions"
+            v-model="state.recommendedClient"
+            label="Decision"
+            :validation="v$.recommendedClient"
+          />
+        </div>
+      </div>
+      <div class="flex justify-between mb-6 gap-6">
         <div class="w-full">
           <label for="comment" class="block text-sm mb-2"
             >Personal Feedback</label
@@ -187,7 +197,7 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref, toRefs } from 'vue';
+import { computed, onMounted, reactive, ref, toRefs } from 'vue';
 import BaseInput from '@/components/shared/BaseInput.vue';
 import BaseSelect from '@/components/shared/BaseSelect.vue';
 import BaseButton from '@/components/shared/BaseButton.vue';
@@ -197,6 +207,7 @@ import { useRouter } from 'vue-router';
 import { useScheduleStore } from '@/stores/schedule';
 import { feedbackValidation } from '@/validations/feedback';
 import useVuelidate from '@vuelidate/core'
+import { useClientStore } from '@/stores/client';
 
 const router = useRouter()
 
@@ -229,6 +240,7 @@ const state = reactive({
     threeMonthContract: schedule.value.feedback?.threeMonthContract,
     salary: schedule.value.feedback?.salary,
     kebeleID: schedule.value.feedback?.kebeleID,
+    recommendedClient: schedule.value.feedback?.recommendedClient || '',
     personalFeedback: schedule.value.feedback?.personalFeedback
 })
 
@@ -272,6 +284,7 @@ async function submit() {
   const isvalid = await v$.value.$validate()
   if (isvalid) {
     scheduleStore.editSchedule(schedule.value._id, feedbackData)
+    scheduleStore.fetchSchedules(`candidate=${schedule.value.candidate}`)
     router.back()
   } else {
     console.log('Validation Error')
@@ -281,4 +294,13 @@ async function submit() {
 function cancel() {
   router.back()
 }
+
+const clientStore = useClientStore()
+
+const recommendedClientOptions = ref(clientStore.clients.map(client => ({label: client.name, value: client._id}),
+))
+
+onMounted(()=>{
+  clientStore.fetchClients()
+})
 </script>

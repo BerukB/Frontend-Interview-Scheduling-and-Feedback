@@ -39,27 +39,28 @@
             :text="schedule.interviewType"
             type="success"
           />
-          <BaseChip
-            v-if="schedule.attendance == 'Came'"
-            :text="schedule.attendance"
-            type="success"
-            class="mx-2"
-          />
+          <template v-if="schedule.interviewType != 'Phone'">
+            <BaseChip
+              v-if="schedule.attendance == 'Came'"
+              :text="schedule.attendance"
+              type="success"
+              class="mx-2"
+            />
 
-          <BaseChip
-            v-if="schedule.attendance == 'Absent'"
-            :text="schedule.attendance"
-            type="danger"
-            class="mx-2"
-          />
+            <BaseChip
+              v-if="schedule.attendance == 'Absent'"
+              :text="schedule.attendance"
+              type="danger"
+              class="mx-2"
+            />
 
-          <BaseChip
-            v-if="schedule.attendance == 'Pending'"
-            :text="schedule.attendance"
-            type="warning"
-            class="mx-2"
-          />
-
+            <BaseChip
+              v-if="schedule.attendance == 'Pending'"
+              :text="schedule.attendance"
+              type="warning"
+              class="mx-2"
+            />
+          </template>
           <div class="flex justify-between">
             <ul class="max-w-md mt-4 text-sm leading-relaxed">
               <li class="flex items-center">

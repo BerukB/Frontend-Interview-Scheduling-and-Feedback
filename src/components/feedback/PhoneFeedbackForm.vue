@@ -242,7 +242,7 @@ const scheduleStore = useScheduleStore()
 async function submit() {
   const isvalid = await v$.value.$validate()
   if (isvalid) {
-    scheduleStore.addSchedule({...schedule, feedback})
+    scheduleStore.addSchedule({...schedule, attendance: 'Came', feedback})
     router.back()
   } else {
     console.log('Validation Error')
