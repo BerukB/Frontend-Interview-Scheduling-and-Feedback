@@ -1,15 +1,16 @@
 <script setup>
-import { reactive, ref, onMounted, computed, defineProps, watch} from 'vue';
+import { reactive, ref, onMounted, computed, watch } from 'vue';
 import BaseInput from '@/components/shared/BaseInput.vue';
 import BaseSelect from '@/components/shared/BaseSelect.vue';
 import BaseButton from '@/components/shared/BaseButton.vue';
-// import BaseSearchInput from './shared/BaseSearchInput.vue';
-// import ComboBox from './shared/ComboBox.vue';
-// const searchInput = ref('');
-
 import { useScheduleStore } from '../stores/scheduleStore';
-import { createSchedule } from '../services/ScheduleService';
+import { useEventStore } from '../stores/eventStore';
+import { createSchedule, updateSchedule } from '../services/ScheduleService';
+import { NotificationToast } from '@/utils/NotificationToast';
+import { MDYhmFormat } from '@/utils/DateFormat.js'
+
 const scheduleStore = useScheduleStore();
+const eventStore = useEventStore();
 
 const interviewerListSet = ref(false);
 const isClientListSet = ref(false);
@@ -19,25 +20,29 @@ const interviewerList = ref([]);
 const candidateList = ref([]);
 const candidate = ref([]);
 const isClientInterview = computed(() => schedule.interviewType === 'Client');
-const props = defineProps({
-  candidateId: {
-    type: String,
-  },
-});
+const currentCandidateId = computed(() => scheduleStore.getCurrentCandidateID);
+const currentScheduleById = computed(() => eventStore.getScheduleById);
+// const scheduleList = computed(() => scheduleStore.getSchedules);
+console.log("schedule aaaaaaaaaaaaaaaaa", currentScheduleById.value._id);
+
 const candidateOptions = computed(() => {
-  return candidate.value.length>0 ? candidate.value : candidateList.value;
+  return candidate.value.length > 0 ? candidate.value : candidateList.value;
 });
-console.log("candidateOptions",  candidateOptions.value)
-console.log("propscandidateId",   props.candidateId)
+
 const interviewType = ref([
-  {value: 'In-person',label: 'In-person',},
-  {value: 'Client', label: 'Client',}
+  { value: 'In-person', label: 'In-person', },
+  { value: 'Client', label: 'Client', }
 
 ])
 
+// const position = ref([
+//   { value: 'SDR', label: 'SDR', }
+
+// ])
+
 const durationList = ref([5, 10, 15, 20, 25, 30, 45, 60])
 const formattedDurationList = durationList.value.map(duration => ({
-  value: duration.toString(), // Convert the number to a string if needed
+  value: duration.toString(),
   label: `${duration} minutes`,
 }));
 
@@ -47,14 +52,20 @@ const schedule = reactive({
   duration: 0,
   interviewType: '',
   interviewer: '',
+  position: '',
   client: '',
 })
-const closePopup = () =>{
+
+const closePopup = () => {
+  scheduleStore.setCandiateToEmpty();
+  scheduleStore.setCurrentCandidateID(null);
   for (const key in schedule) {
-    schedule[key] = ''; // Reset each form field to an empty string
+    schedule[key] = '';
   }
- scheduleStore.setPopupValue(false);
+
+  scheduleStore.setPopupValue(false);
 }
+
 const fetchClient = async () => {
   try {
     await scheduleStore.setClientList();
@@ -88,12 +99,11 @@ const fetchCandidate = async () => {
   try {
     await scheduleStore.setCandidateList();
     isCandidateListSet.value = true;
-
     candidateList.value = scheduleStore.getCandidateList.map(candidate => ({
       value: candidate._id,
-      label: `${candidate.firstName} ${candidate.lastName}`
+      label: `${candidate.user.firstName} ${candidate.user.lastName}`
     }));
-    
+
   } catch (error) {
     console.error('Error in setClientList:', error);
   }
@@ -101,74 +111,72 @@ const fetchCandidate = async () => {
 const fetchCandidateById = async (id) => {
   try {
     await scheduleStore.setCandidateById(id);
-
     candidate.value = scheduleStore.getCandidate.map(candidate => ({
       value: candidate._id,
-      label: `${candidate.firstName} ${candidate.lastName}`
+      label: `${candidate.user.firstName} ${candidate.user.lastName}`
     }));
-    console.log("chemdesa",  candidate.value)
   } catch (error) {
     console.error('Error in fetchCandidateById:', error);
   }
 };
-watch(() => props.candidateId, (newCandidateId, oldCandidateId) => {
 
+
+
+watch(() => currentCandidateId.value, (newCandidateId, oldCandidateId) => {
+  console.log('Hello its me:', candidate.value);
   console.log('Candidate ID changed:', oldCandidateId, '->', newCandidateId);
-
-  fetchCandidateById(newCandidateId);
+  if (newCandidateId !== null) fetchCandidateById(newCandidateId);
 });
 
 onMounted(async () => {
   await Promise.all([fetchClient(), fetchInterviewer(), fetchCandidate()]);
-  // console.log("CLIENTS:", clientList.value);
-  // console.log("interviewerList:", interviewerList.value);
-   console.log("candList:", candidateList.value);
+
+  
+  // Check if there is data in currentScheduleById.value
+  if (currentScheduleById.value) {
+    const scheduleData = currentScheduleById.value;
+    const datein = MDYhmFormat(scheduleData.date)
+    console.log("abebebeso",  datein );
+    // Assign values from currentScheduleById to schedule
+    schedule.candidate = scheduleData.candidate._id|| '';
+    schedule.date = datein || '';
+    schedule.duration = scheduleData.duration || 0;
+    schedule.interviewType = scheduleData.interviewType || '';
+    schedule.interviewer = scheduleData.interviewer._id || '';
+    schedule.position = scheduleData.position || '';
+    schedule.client = scheduleData.client || '';
+  }
 });
 
 
 
-// const user = ref()
-// console.log("helooooooo", user.value)
-// async function loadUsers(query, setOptions) {
-//   const response = await axios.get("http://localhost:3000/api/clients", {
-//     params: { q: query }
-//   });
-//   const result = response.data.data;
-//   console.log("weeeeeeeeeeeee", result)
-
-//   setOptions(
-//     result.map(user => {
-//       return {
-//         value: user._id,
-//         label: user.name,
-//       }
-//     })
-//   )
-// }
 const getCurrentDatetime = computed(() => {
   const now = new Date();
-  // Format the date and time as a string in the required format (YYYY-MM-DDThh:mm)
   const formattedDatetime = now.toISOString().slice(0, 16);
-  console.log(formattedDatetime);
   return formattedDatetime;
 });
 
 
 async function submit() {
   try {
-  console.log("DATA", schedule);
-    // const response = await axios.post('http://localhost:3000/api/schedules', schedule);
-    
-    const response = await createSchedule(schedule);
-
-    console.log("POST response:", response.data);
+    schedule.interviewType !== 'Client' ? delete schedule.client : ''
+    scheduleStore.setCandiateToEmpty();
+    scheduleStore.setCurrentCandidateID(null);
+    if(currentScheduleById.value._id){
+      const { data } = await updateSchedule(currentScheduleById.value._id, schedule)
+      data ? NotificationToast("Meeting Scheduled", 'success') : ""
+    }else {
+      const { data } = await createSchedule(schedule);
+    data ? NotificationToast("Meeting Scheduled", 'success') : ""
+    }
   
+
   } catch (error) {
     console.error("Error in POST request:", error);
-
+    NotificationToast(error.data.message, 'error')
   }
   for (const key in schedule) {
-    schedule[key] = ''; // Reset each form field to an empty string
+    schedule[key] = '';
   }
   scheduleStore.setPopupValue(false);
 }
@@ -177,18 +185,25 @@ async function submit() {
 <template>
   <div class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-10">
     <div class="bg-white px-8 py-6 rounded-lg ">
-      <form @submit.prevent="submit" class="flex flex-col space-y-2">
-        <!-- Your popup content goes here -->
-        <BaseSelect :options="candidateOptions" v-model="schedule.candidate" label="Candidate" />
-        <BaseInput v-model="schedule.date" label="Date" type="datetime-local" :min="getCurrentDatetime" name="scheduleDate" />
-        <BaseSelect :options="interviewType" v-model="schedule.interviewType" label="Interview Type" />
-        <BaseSelect :options="formattedDurationList" v-model="schedule.duration" label="Duration" />
-        <BaseSelect :options="interviewerList" v-model="schedule.interviewer" label="Interviewer" />
-
-        <BaseSelect v-show="isClientInterview" :options="clientList" v-model="schedule.client" label="client" />
+      <form @submit.prevent="submit" class="flex flex-col space-y-4">
+<div class="flex flex-row space-x-4">
+  
+          <div class="flex flex-col space-y-2">
+            <BaseSelect :options="candidateOptions" v-model="schedule.candidate" label="Candidate" />
+            <BaseInput v-model="schedule.date" label="Date" type="datetime-local" :min="getCurrentDatetime"
+              name="scheduleDate" />
+            <BaseSelect :options="interviewType" v-model="schedule.interviewType" label="Interview Type" />
+          </div>
+          <div class="flex flex-col space-y-2">
+            <BaseSelect :options="formattedDurationList" v-model="schedule.duration" label="Duration" />
+            <BaseInput v-model="schedule.position" label="Position" />
+            <BaseSelect :options="interviewerList" v-model="schedule.interviewer" label="Interviewer" />
+            <BaseSelect v-show="isClientInterview" :options="clientList" v-model="schedule.client" label="client" />
+          </div>
+</div>
         <!-- <ComboBox :load-options="loadUsers" v-model="user" /> -->
 
-        <div class="flex justify-end ">
+        <div class="flex justify-center ">
           <BaseButton @click="closePopup" text="Discard" type="button" buttonType="secondary" />
           <BaseButton text="Submit" type="submit" />
         </div>

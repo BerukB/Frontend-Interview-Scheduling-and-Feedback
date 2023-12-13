@@ -50,8 +50,6 @@ let calendarOptions =ref({
   },
   selectable: false,
   events: eventsList.value,
-  themeSystem: 'bootstrap5',
-  backgroundColor: 'rgb(0, 98, 255)',
   // select: handleSelect,
   // eventClick: handleClick,
 
@@ -101,7 +99,7 @@ console.log("EventsList",  eventsList.value);
 <template>
   <div class="px-10 bg-red ">
     <div class="flex justify-end ">
-      <button @click="openPopup" class="p-2 mb-3 bg-orange-400 text-white">
+      <button @click="openPopup" class="p-2 mb-3 bg-secondary text-white font-bold text-sm rounded-md py-3 px-4 m-2 min-w-[150px] disabled:opacity-25 border-secondary border-2 hover:opacity-70 transition-all">
         New Schedule
       </button>
     </div>

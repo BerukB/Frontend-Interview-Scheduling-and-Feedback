@@ -5,6 +5,7 @@ import PhoneFeedbackView from '@/views/PhoneFeedbackView.vue';
 import CandidateView from '@/views/CandidateView.vue';
 import CandidateDetailsView from '@/views/CandidateDetailsView.vue';
 import LoginView from '@/views/LoginView.vue';
+import MyScheduleView from '@/views/MyScheduleView.vue';
 import HomeView from '@/views/HomeView.vue';
 import { useAuthStore } from '@/stores/auth';
 
@@ -51,6 +52,12 @@ const router = createRouter({
       path: '/schedules',
       name: 'Schedule',
       component: ScheduleView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/schedules/me',
+      name: 'MySchedule',
+      component: MyScheduleView,
       meta: { requiresAuth: true },
     },
   ],
