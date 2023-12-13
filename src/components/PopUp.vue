@@ -7,7 +7,8 @@ import { useScheduleStore } from '../stores/scheduleStore';
 import { useEventStore } from '../stores/eventStore';
 import { createSchedule, updateSchedule } from '../services/ScheduleService';
 import { NotificationToast } from '@/utils/NotificationToast';
-import { MDYhmFormat } from '@/utils/DateFormat.js'
+import { scheduleValidation } from '@/validations/schedule';
+import useVuelidate from '@vuelidate/core'
 
 const scheduleStore = useScheduleStore();
 const eventStore = useEventStore();
@@ -22,8 +23,6 @@ const candidate = ref([]);
 const isClientInterview = computed(() => schedule.interviewType === 'Client');
 const currentCandidateId = computed(() => scheduleStore.getCurrentCandidateID);
 const currentScheduleById = computed(() => eventStore.getScheduleById);
-// const scheduleList = computed(() => scheduleStore.getSchedules);
-console.log("schedule aaaaaaaaaaaaaaaaa", currentScheduleById.value._id);
 
 const candidateOptions = computed(() => {
   return candidate.value.length > 0 ? candidate.value : candidateList.value;
@@ -128,6 +127,7 @@ watch(() => currentCandidateId.value, (newCandidateId, oldCandidateId) => {
   if (newCandidateId !== null) fetchCandidateById(newCandidateId);
 });
 
+
 onMounted(async () => {
   await Promise.all([fetchClient(), fetchInterviewer(), fetchCandidate()]);
 
@@ -135,11 +135,12 @@ onMounted(async () => {
   // Check if there is data in currentScheduleById.value
   if (currentScheduleById.value) {
     const scheduleData = currentScheduleById.value;
-    const datein = MDYhmFormat(scheduleData.date)
-    console.log("abebebeso",  datein );
-    // Assign values from currentScheduleById to schedule
+
+    const originalDate = new Date(scheduleData.date) ;
+    let formattedDate = originalDate.toISOString().slice(0, 16);
+
     schedule.candidate = scheduleData.candidate._id|| '';
-    schedule.date = datein || '';
+    schedule.date = formattedDate || '';
     schedule.duration = scheduleData.duration || 0;
     schedule.interviewType = scheduleData.interviewType || '';
     schedule.interviewer = scheduleData.interviewer._id || '';
@@ -156,20 +157,29 @@ const getCurrentDatetime = computed(() => {
   return formattedDatetime;
 });
 
+const v$ = useVuelidate(scheduleValidation(), schedule)
 
 async function submit() {
+  const isvalid = await v$.value.$validate()
+  
   try {
-    schedule.interviewType !== 'Client' ? delete schedule.client : ''
+    if (isvalid) {
+      schedule.interviewType !== 'Client' ? delete schedule.client : ''
     scheduleStore.setCandiateToEmpty();
     scheduleStore.setCurrentCandidateID(null);
-    if(currentScheduleById.value._id){
+    if(currentScheduleById.value?._id){
       const { data } = await updateSchedule(currentScheduleById.value._id, schedule)
       data ? NotificationToast("Meeting Scheduled", 'success') : ""
     }else {
       const { data } = await createSchedule(schedule);
     data ? NotificationToast("Meeting Scheduled", 'success') : ""
     }
-  
+    scheduleStore.setPopupValue(false);
+
+  } else {
+    console.log('Validation Error')
+  }
+ 
 
   } catch (error) {
     console.error("Error in POST request:", error);
@@ -178,7 +188,6 @@ async function submit() {
   for (const key in schedule) {
     schedule[key] = '';
   }
-  scheduleStore.setPopupValue(false);
 }
 </script>
 
@@ -189,16 +198,18 @@ async function submit() {
 <div class="flex flex-row space-x-4">
   
           <div class="flex flex-col space-y-2">
-            <BaseSelect :options="candidateOptions" v-model="schedule.candidate" label="Candidate" />
+            <BaseSelect :validation="v$.candidate" :options="candidateOptions" v-model="schedule.candidate" label="Candidate"  />
             <BaseInput v-model="schedule.date" label="Date" type="datetime-local" :min="getCurrentDatetime"
-              name="scheduleDate" />
-            <BaseSelect :options="interviewType" v-model="schedule.interviewType" label="Interview Type" />
+              name="scheduleDate" :validation="v$.date"
+ />
+            <BaseSelect :validation="v$.interviewType" :options="interviewType" v-model="schedule.interviewType" label="Interview Type" />
+            <BaseSelect v-show="isClientInterview" :options="clientList" v-model="schedule.client" label="Client" />
+
           </div>
           <div class="flex flex-col space-y-2">
-            <BaseSelect :options="formattedDurationList" v-model="schedule.duration" label="Duration" />
-            <BaseInput v-model="schedule.position" label="Position" />
-            <BaseSelect :options="interviewerList" v-model="schedule.interviewer" label="Interviewer" />
-            <BaseSelect v-show="isClientInterview" :options="clientList" v-model="schedule.client" label="client" />
+            <BaseSelect :validation="v$.duration" :options="formattedDurationList" v-model="schedule.duration" label="Duration" />
+            <BaseInput :validation="v$.position" v-model="schedule.position" label="Position" />
+            <BaseSelect :validation="v$.interviewer" :options="interviewerList" v-model="schedule.interviewer" label="Interviewer" />
           </div>
 </div>
         <!-- <ComboBox :load-options="loadUsers" v-model="user" /> -->
