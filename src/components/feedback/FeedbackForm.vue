@@ -58,6 +58,7 @@
             :options="educationalStatusOptions"
             v-model="state.educationalStatus"
             label="Educational Status"
+            :validation="v$.educationalStatus"
           />
         </div>
         <div class="w-1/2">
@@ -65,6 +66,7 @@
             :options="workStatusOptions"
             v-model="state.workStatus"
             label="Work Status"
+            :validation="v$.workStatus"
           />
         </div>
       </div>
@@ -78,6 +80,7 @@
             name="rotationalShift"
             :options="BooleanOptions"
             vertical
+            :validation="v$.rotationalShift"
           />
         </div>
         <div class="w-1/2">
@@ -89,6 +92,7 @@
             name="weekend"
             :options="BooleanOptions"
             vertical
+            :validation="v$.weekend"
           />
         </div>
       </div>
@@ -102,6 +106,7 @@
             name="training"
             :options="BooleanOptions"
             vertical
+            :validation="v$.training"
           />
         </div>
         <div class="w-1/2">
@@ -111,6 +116,7 @@
             name="threeMonthContract"
             :options="BooleanOptions"
             vertical
+            :validation="v$.threeMonthContract"
           />
         </div>
       </div>
@@ -122,6 +128,7 @@
             name="salary"
             :options="BooleanOptions"
             vertical
+            :validation="v$.salary"
           />
         </div>
         <div class="w-1/2">
@@ -131,6 +138,7 @@
             name="kebeleID"
             :options="BooleanOptions"
             vertical
+            :validation="v$.kebeleID"
           />
         </div>
       </div>
@@ -140,6 +148,7 @@
             :options="resultOptions"
             v-model="state.result"
             label="Result"
+            :validation="v$.result"
           />
         </div>
         <div class="w-1/2">
@@ -147,6 +156,16 @@
             :options="resultOptions"
             v-model="state.enockResult"
             label="Enock Result"
+          />
+        </div>
+      </div>
+      <div class="flex justify-between mb-6 gap-6">
+        <div class="w-1/2">
+          <BaseSelect
+            :options="recommendedClientOptions"
+            v-model="state.recommendedClient"
+            label="Decision"
+            :validation="v$.recommendedClient"
           />
         </div>
       </div>
@@ -178,7 +197,7 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref, toRefs } from 'vue';
+import { computed, onMounted, reactive, ref, toRefs } from 'vue';
 import BaseInput from '@/components/shared/BaseInput.vue';
 import BaseSelect from '@/components/shared/BaseSelect.vue';
 import BaseButton from '@/components/shared/BaseButton.vue';
@@ -186,6 +205,9 @@ import BaseRadioGroup from '@/components/shared/BaseRadioGroup.vue';
 import { MDYhmFormat } from '@/utils/DateFormat.js'
 import { useRouter } from 'vue-router';
 import { useScheduleStore } from '@/stores/schedule';
+import { feedbackValidation } from '@/validations/feedback';
+import useVuelidate from '@vuelidate/core'
+import { useClientStore } from '@/stores/client';
 
 const router = useRouter()
 
@@ -218,6 +240,7 @@ const state = reactive({
     threeMonthContract: schedule.value.feedback?.threeMonthContract,
     salary: schedule.value.feedback?.salary,
     kebeleID: schedule.value.feedback?.kebeleID,
+    recommendedClient: schedule.value.feedback?.recommendedClient || '',
     personalFeedback: schedule.value.feedback?.personalFeedback
 })
 
@@ -253,14 +276,31 @@ const feedbackData = {
   feedback: state
 }
 
+const v$ = useVuelidate(feedbackValidation(), state)
+
 const scheduleStore = useScheduleStore()
 
-function submit() {
-  scheduleStore.editSchedule(schedule.value._id, feedbackData)
-  router.back()
+async function submit() {
+  const isvalid = await v$.value.$validate()
+  if (isvalid) {
+    scheduleStore.editSchedule(schedule.value._id, feedbackData)
+    scheduleStore.fetchSchedules(`candidate=${schedule.value.candidate}`)
+    router.back()
+  } else {
+    console.log('Validation Error')
+  }
 }
 
 function cancel() {
   router.back()
 }
+
+const clientStore = useClientStore()
+
+const recommendedClientOptions = ref(clientStore.clients.map(client => ({label: client.name, value: client._id}),
+))
+
+onMounted(()=>{
+  clientStore.fetchClients()
+})
 </script>

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import {
   getSchedules,
   updateSchedule,
@@ -11,12 +11,14 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
   const schedules = ref([]);
   const isLoading = ref(false);
   const error = ref('');
+  const count = ref(0);
 
   async function fetchSchedules(params = '') {
     isLoading.value = true;
     try {
       const { data } = await getSchedules(params);
       schedules.value = data.data;
+      count.value = data.metadata.total;
     } catch (err) {
       error.value = err.response.data.message || 'Error';
       NotificationToast(error, 'error');
@@ -51,5 +53,17 @@ export const useScheduleStore = defineStore('scheduleStore', () => {
     }
   }
 
-  return { schedules, fetchSchedules, editSchedule, addSchedule, isLoading };
+  const feedbackCount = computed(
+    () => schedules.value.filter((schedule) => 'feedback' in schedule).length
+  );
+
+  return {
+    schedules,
+    fetchSchedules,
+    editSchedule,
+    addSchedule,
+    isLoading,
+    count,
+    feedbackCount,
+  };
 });

@@ -17,6 +17,15 @@
       @update:modelValue="$emit('update:modelValue', $event)"
     />
   </component>
+  <template v-if="validation && validation.$errors">
+    <span
+      v-for="error in validation.$errors"
+      :key="error.$uid"
+      class="text-red-600 text-sm"
+    >
+      {{ error.$message }}
+    </span>
+  </template>
 </template>
 
 <script setup>
@@ -38,6 +47,9 @@ defineProps({
     vertical: {
       type: Boolean,
       default: false
+    },
+    validation: {
+      type: Object
     }
 })
 </script>

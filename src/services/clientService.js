@@ -1,15 +1,19 @@
 import { apiClient } from './service';
 
-const getClients = () => {
-  return apiClient.get('/clients');
+const getClients = (params = '') => {
+  return apiClient.get(`/clients?${params}`);
 };
 
 const createClient = (data) => {
   return apiClient.post('/clients', data);
 };
 
-const updateClient = (data) => {
-  return apiClient.patch('/clients', data);
+const updateClient = (id, data) => {
+  return apiClient.patch(`/clients/${id}`, data);
 };
 
-export { getClients, createClient, updateClient };
+const deleteClient = (id) => {
+  return apiClient.patch(`/clients/${id}`);
+};
+
+export { getClients, createClient, updateClient, deleteClient };

@@ -6,6 +6,7 @@ import CandidateView from '@/views/CandidateView.vue';
 import CandidateDetailsView from '@/views/CandidateDetailsView.vue';
 import LoginView from '@/views/LoginView.vue';
 import MyScheduleView from '@/views/MyScheduleView.vue';
+import HomeView from '@/views/HomeView.vue';
 import { useAuthStore } from '@/stores/auth';
 
 const router = createRouter({
@@ -14,7 +15,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'Home',
-      component: '',
+      component: HomeView,
     },
     {
       path: '/feedback',

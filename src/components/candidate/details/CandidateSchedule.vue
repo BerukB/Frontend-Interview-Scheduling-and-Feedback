@@ -39,27 +39,28 @@
             :text="schedule.interviewType"
             type="success"
           />
-          <BaseChip
-            v-if="schedule.attendance == 'Came'"
-            :text="schedule.attendance"
-            type="success"
-            class="mx-2"
-          />
+          <template v-if="schedule.interviewType != 'Phone'">
+            <BaseChip
+              v-if="schedule.attendance == 'Came'"
+              :text="schedule.attendance"
+              type="success"
+              class="mx-2"
+            />
 
-          <BaseChip
-            v-if="schedule.attendance == 'Absent'"
-            :text="schedule.attendance"
-            type="danger"
-            class="mx-2"
-          />
+            <BaseChip
+              v-if="schedule.attendance == 'Absent'"
+              :text="schedule.attendance"
+              type="danger"
+              class="mx-2"
+            />
 
-          <BaseChip
-            v-if="schedule.attendance == 'Pending'"
-            :text="schedule.attendance"
-            type="warning"
-            class="mx-2"
-          />
-
+            <BaseChip
+              v-if="schedule.attendance == 'Pending'"
+              :text="schedule.attendance"
+              type="warning"
+              class="mx-2"
+            />
+          </template>
           <div class="flex justify-between">
             <ul class="max-w-md mt-4 text-sm leading-relaxed">
               <li class="flex items-center">
@@ -112,6 +113,7 @@
                 v-if="CheckDate(schedule.date) && !schedule.feedback"
                 text=" Cancel"
                 buttonType="secondary"
+                @click="handleCancel(schedule._id)"
               />
             </div>
           </div>
@@ -119,24 +121,56 @@
       </div>
     </li>
   </ol>
+  <ConfirmationDialog
+    v-if="openPopup"
+    @close="handleClose"
+    @confirm="handleConfirm"
+  />
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 import BaseButton from '@/components/shared/BaseButton.vue'
 import BaseChip from '@/components/shared/BaseChip.vue'
 import { MDYhmFormat } from '@/utils/DateFormat.js'
 import { CheckDate } from '@/utils/CheckDate.js'
 import { useScheduleStore } from '@/stores/schedule';
-import ScheduleSkeleton from '../../skeleton/ScheduleSkeleton.vue';
+import ScheduleSkeleton from '@/components/skeleton/ScheduleSkeleton.vue';
 import { storeToRefs } from 'pinia';
+import ConfirmationDialog from '@/components/candidate/details/ConfirmationDialog.vue'
+import { deleteSchedule } from '@/services/ScheduleService'
+import { NotificationToast } from '@/utils/NotificationToast';
+
+const openPopup = ref(false)
+const scheduleId = ref()
 
 const route = useRoute()
 
 const scheduleStore = useScheduleStore()
 
 const { schedules, isLoading } = storeToRefs(scheduleStore)
+
+function handleCancel(id) {
+  scheduleId.value = id
+  openPopup.value = true
+}
+
+function handleClose() {
+  openPopup.value = false
+}
+
+async function handleConfirm() {
+  try {
+        const  { data } = await deleteSchedule(scheduleId.value)
+        openPopup.value = false
+        data ? NotificationToast("Interview Cancelled!", 'success') : ''
+        scheduleStore.fetchSchedules(`candidate=${route.params.id}`)
+  } catch (error) {
+        NotificationToast(error.response.data.message || 'Error', 'error')
+        openPopup.value = false
+  }
+}
 
 onMounted(() => {
   scheduleStore.fetchSchedules(`candidate=${route.params.id}`)

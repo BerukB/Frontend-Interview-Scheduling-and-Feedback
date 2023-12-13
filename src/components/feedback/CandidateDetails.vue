@@ -3,7 +3,7 @@
     <h3 class="font-bold mb-4">Candidate Details</h3>
     <hr />
     <CandidateSkeleton v-if="isLoading" />
-    <div class="mt-4">
+    <div class="mt-4" v-if="!isLoading">
       <dl class="divide-y divide-gray-100">
         <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
           <dt class="text-sm font-medium">Full name</dt>
@@ -49,7 +49,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { getCandidateById } from '@/services/CandidateService';
-import CandidateSkeleton from '../skeleton/CandidateSkeleton.vue';
+import CandidateSkeleton from '@/components/skeleton/CandidateSkeleton.vue';
 
 const isLoading = ref(true)
 
